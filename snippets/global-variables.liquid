@@ -1,0 +1,17 @@
+<script>
+  window.themeName = 'theme';
+  window[themeName] = {
+    themeID: "{{ theme.id }}",
+    config: {
+        axios:{
+        baseURL: "{{ shop.secure_url }}"
+      },
+      cache: {
+        maxAge: 15*60*1000,
+        exclude: { query: false, paths: [/.*cart.*/] },
+        debug: true
+      }
+    },
+    all_products_count:  {{ collections.all.all_products_count }}
+  }
+</script>

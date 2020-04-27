@@ -1,0 +1,20 @@
+${product?html`
+  <div>
+    <a href="${product.url}" class="grid-link text-center">
+      <span class="grid-link__image grid-link__image-sold-out grid-link__image--product" data-image-wrapper>
+        <span class="grid-link__image-centered">
+          <img src="${product.featured_image}" alt="" class="product__img">
+        </span>
+      </span>
+      <p class="grid-link__title">${product.title}</p>
+      <p class="grid-link__title grid-link__vendor">${product.vendor}</p>
+    </a>
+    <p class="grid-link__meta">
+	${product.compare_at_price > product.price?html`
+      <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+      <s class="grid-link__sale_price">${product.compare_at_price}</s>`:''}
+	  <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+      ${product.price}
+      </p>
+  </div>
+`:html``}

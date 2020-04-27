@@ -1,0 +1,321 @@
+Objects:
+address(shipping_address, billing_address)
+all_products(g)
+all_country_option_tags(g)
+articles(g)
+article
+block
+blogs(g)
+blog
+canonical_url(g)
+cart(g)
+checkout
+collections(g)
+collection
+comment
+country_option_tags
+currency
+current_page(g)
+current_tags(g)
+customer(g)
+customer_address
+discount
+discount_allocation
+discount_application
+external_video(+)
+font
+forloop
+form
+fulfillment
+gift_card
+handle(g)
+images(g)
+image
+line_item
+link
+linklists(g)
+linklist
+metafield
+model(+)
+model_source(+)
+order
+pages(g)
+page
+page_description(g)
+page_title(g)
+paginate
+part
+policy
+product 
+product_option
+recommendation(g)
+request
+routes
+shop(g)
+scripts(g)
+script
+search
+section
+shipping_method
+shop
+shop_locale
+tablerow
+tax_line
+settings(g)
+template(g)
+theme(g)
+transaction
+unit_price_measurement
+variant
+video(+)
+video_scource(+)
+
+Tags:
+control flow tags:
+if
+unless
+else/elsif
+case/when
+and/or
+iternation tags:
+for
+cycle
+tablerow
+theme tags:
+comment
+echo
+form
+layout
+liquid
+pageinate
+raw
+render
+section
+style
+variable tags:
+assign
+capture
+increment
+decrement
+
+Filters:
+array filters:
+join
+first
+last
+concat
+index
+map
+reverse
+size
+sort
+where
+uniq
+
+color filters:
+color_to_rgb
+color_to_hsl
+color_to_hex
+color_extract
+color_brightness
+color_modify
+color_lighten
+color_darken
+color_saturate
+color_desaturate
+color_mix
+color_contrast
+color_difference
+brightness_difference
+
+font filters:
+font_modify
+font_face
+font_url
+
+html filters:
+img_tag
+currency_selector
+payment_button
+script_tag
+stylesheet_tag
+time_tag
+payment_type_svg_tag
+
+math_filter:
+abs
+at_most
+at_least
+ceil
+divided_by
+floor
+minus
+plus
+round
+times
+modulo
+
+media filters(+):
+external_video_tag
+external_video_url
+img_tag
+img_url
+media_tag
+model_viewer_tag
+video_tag
+
+money filters:
+money
+money_with_currency
+money_without_trailing_zeros
+money_without_currency
+
+string filters:
+append
+camelcase
+capitalize
+downcase
+escape
+handle
+md5
+sha1
+sha256
+hmac_sha1
+hmac_sha256
+newline_to_br
+pluralize
+prepend
+remove
+remove_first
+replace
+replace_first
+slice
+split
+strip
+lstrip
+rstrip
+strip_html
+strip_newlines
+truncate
+truncatewords
+upcase
+url_escape
+url_param_escape
+reverse
+first
+last
+
+url filters:
+asset_url
+asset_img_url
+file_url
+file_img_url
+customer_login_link
+global_asset_url
+img_url
+link_to
+link_to_vendor
+link_to_type
+link_to_tag
+link_to_add_tag
+link_to_remove_tag
+payment_type_img_url
+shopify_asset_url
+(option_selection.js, api.jquery.js, shopify_common.js, customer_area.js, currencies.js, customer.css)
+url_for_type
+url_for_vendor
+within
+
+addtional filters:
+date
+default
+default_errors
+default_pagination
+format_address
+highlight
+highlight_active_tag
+json
+weight_with_unit
+placeholder_svg_tag
+
+
+lightbox plugin
+
+product page:
+create a size chart (through create new pages)
+
+Show SKU numbers on product pages
+Get customers to choose an option 🙂 
+Hide sold-out variants
+Show featured image until a variant is selected (add a "select an option" and show product's featured image)
+Select variants by clicking their images
+Update a theme to use variant images
+Secondary product images can be enlarged with a lightbox or zooming
+we can add a contact link to replace atc button when a product is not available
+Replace “Add to cart” with a contact link(https://shopify.dev/tutorials/customize-theme-replace-add-to-cart-button)
+
+
+cart page:
+Add a 'Continue shopping' link to your cart
+Add a delivery date picker to your cart
+Add a gift-wrap option to your cart page
+Add more checkout buttons to the cart page
+Hide product prices(https://shopify.dev/tutorials/customize-theme-hide-product-prices) we maybe need to wrap custom class span to wrap prices
+Enable order notes on your cart page
+Displaying discount amounts(https://shopify.dev/tutorials/develop-theme-discounts)
+Showing product recommendations with the Product Recommendations API products response(https://shopify.dev/tutorials/customize-theme-recommend-products)
+
+
+collection page:
+Add a “Sort by” menu to collection pages 🙂
+Change your catalog page (add option to filter products)
+Filter collections with product tags 🙂
+Change the number of products shown on collection pages
+
+collection list page:
+Change the order of your collections(https://shopify.dev/tutorials/customize-theme-change-collections-page)
+
+general settings:
+Add fonts to your theme(https://shopify.dev/tutorials/develop-theme-fonts)
+Choose which payment icons show in your footer(https://shopify.dev/tutorials/customize-theme-add-credit-card-icons)
+Support multiple currencies in your theme(https://shopify.dev/tutorials/customize-theme-support-multiple-currencies#example-currency-selectors)
+Add a back to top button on long pages
+Add breadcrumb navigation
+Creating nested menus
+Predictive search(https://shopify.dev/tutorials/add-predictive-search-to-your-shopify-theme)
+Edit your storefront search results(https://shopify.dev/tutorials/customize-theme-edit-storefront-search-results#sorting-search-results-based-on-product-availability)
+1)Searching only for certain types
+2)Sorting search results based on product availability
+3)Enabling partial word matches
+Ask how customers heard about your store
+Adding Media to themes(https://shopify.dev/tutorials/add-theme-support-for-rich-media-3d-and-video)
+
+customer related page:
+Add fields to the customer registration form
+Choose which page to show when customers log in to your store
+Get consent for promotional emails when customers register
+
+contact page:
+Add a contact page to your store(https://shopify.dev/tutorials/customize-theme-add-fields-to-your-contact-form)
+contact page template can be edited through shopify editor, like add input field
+
+
+
+SEO related
+Localize your product prices for search engines(https://shopify.dev/tutorials/customize-theme-search-results)
+
+It's recommended that themes show a message explaining that cookies need to be enabled before products can be purchased. Support for cookies can be detected with JavaScript.
+
+To test we should have at least four products:
+One product on sale
+One product sold out
+One product that has multiple product options
+One product that has variant images
+
+
+ 
+
+
+
+
+

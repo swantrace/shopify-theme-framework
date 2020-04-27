@@ -1,0 +1,292 @@
+{{ 'https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js' | script_tag }}
+{{ 'https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js' | script_tag }}
+<script src="//cdn.rawgit.com/muicss/sentineljs/0.0.5/dist/sentinel.min.js"></script>
+
+<script type="module">
+  import { html, directive, AttributePart } from 'https://unpkg.com/lit-html/lit-html.js';
+  import { component, virtual, useState, useEffect, useReducer, useMemo, useRef } from 'https://unpkg.com/haunted/haunted.js';
+  
+  {% render 'small-tests' %}
+  
+  const encodedStr = rawStr => rawStr.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+    return '&#' + i.charCodeAt(0) + ';';
+  });
+  
+
+  document.addEventListener("add-cart-from-form", function(e){
+    Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.setAttribute("cart_updating", ""));
+  	const form = e.detail.form;
+    const tmp = new Date().getTime();
+    axios.post("/cart/add.js?" + tmp, new FormData(form))
+    .then(result => result.data)
+    .then(item => {
+      const tmp = new Date().getTime();
+	  return axios.get("/cart.js?" + tmp);
+    })
+    .then(result => result.data)
+    .then(cart => {
+      console.log(cart);
+      Array.from(document.querySelectorAll('[theme-cart-form]')).forEach(el => el.setAttribute("cart_json", encodedStr(JSON.stringify(cart))))
+      Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.removeAttribute("cart_updating"));
+    });
+  });
+  
+  document.addEventListener("update-cart-from-form", function(e){
+    Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.setAttribute("cart_updating", ""));
+  	const form = e.detail.form;
+    const tmp = new Date().getTime();
+    axios.post("/cart/update.js?" + tmp, new FormData(form))
+    .then(result => result.data)
+    .then(cart => {
+      Array.from(document.querySelectorAll('[theme-cart-form]')).forEach(el => el.setAttribute("cart_json", encodedStr(JSON.stringify(cart))))
+      Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.removeAttribute("cart_updating"));
+    });
+  });
+  
+  document.addEventListener("remove-item-by-line", function(e){
+    const clickedTarget = e.detail.target;
+    const removeLink = clickedTarget.closest('a[href*="quantity=0"]');
+    const paraStr = (removeLink.href && (typeof removeLink.href.split === 'function') && removeLink.href.split('?').length > 1)?removeLink.href.split('?')[1]:null
+    if(paraStr) {
+      Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.setAttribute("cart_updating", ""));
+      const tmp = new Date().getTime();
+      axios.post("/cart/change.js?" + tmp, paraStr)
+      .then(result => result.data)
+      .then(cart => {
+        console.log(cart);
+        Array.from(document.querySelectorAll('[theme-cart-form]')).forEach(el => el.setAttribute("cart_json", encodedStr(JSON.stringify(cart))))
+        Array.from(document.querySelectorAll('[theme-atc-form], [theme-cart-form]')).forEach(el => el.removeAttribute("cart_updating"));
+      });
+    }
+  });
+  
+  function addToCartForm({product_handle, cart_updating}) {
+    const [product, setProduct] = useState(null);
+    const [currentVariant, setCurrentVariant] = useState(null);
+    const [options, setOptions] = useState(null);
+    useEffect(() => {
+      axios.get(`/products/${product_handle}?view=theme`)
+      .then(response => response.data)
+      .then(rawProduct => {
+        const currentVariantId = rawProduct.selected_variant_id?rawProduct.selected_variant_id:rawProduct.first_available_variant_id?rawProduct.first_available_variant_id:null;
+        const currentVariant = !currentVariantId?null:rawProduct.variants.find(variant => variant.id === currentVariantId);
+        const options = rawProduct.options_with_values;
+        delete rawProduct['selected_variant_id'];
+        delete rawProduct['first_available_variant_id']
+        setProduct(rawProduct);
+        setCurrentVariant(currentVariant);
+        setOptions(options);
+      });
+    }, ["product_handle"]);
+    
+    const addCartFromForm = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('add-cart-from-form', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { form: this.querySelector('form[action="/cart/add"]') } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    const changeVariantAccordingToOptions = (e) => {
+      const option1 = this.querySelector('select[data-option="option1"]') && this.querySelector('select[data-option="option1"]').value;
+      const option2 = this.querySelector('select[data-option="option2"]') && this.querySelector('select[data-option="option2"]').value;
+      const option3 = this.querySelector('select[data-option="option3"]') && this.querySelector('select[data-option="option3"]').value;
+      const currentVariant = product.variants.find(variant => variant.option1 === option1 && variant.option2 === option2 && variant.option3 === option3);
+      setCurrentVariant(currentVariant);
+    }
+
+    return html`{% render 'add-to-cart-form' %}`;
+  }
+  
+  customElements.define('add-to-cart-form', component(addToCartForm, {observedAttributes: ['product_handle', 'cart_updating'], useShadowDOM: false}))
+  
+  
+  function cartFormA({cart_json, cart_updating}) {
+    
+    const cartObj = JSON.parse(cart_json);
+    const updateCartFromForm = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('update-cart-from-form', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { form: this.querySelector('form[action="/cart"]') } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    const removeItemByLine = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('remove-item-by-line', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { target: e.target } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    return html`{% render 'cart-form-a' %}`
+  }
+  
+  customElements.define('cart-form-a', component(cartFormA, {observedAttributes: ['cart_json', 'cart_updating'], useShadowDOM: false}))
+  
+  function cartFormB({cart_json, cart_updating}) {
+  
+    const cartObj = JSON.parse(cart_json);
+    const updateCartFromForm = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('update-cart-from-form', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { form: this.querySelector('form[action="/cart"]') } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    const removeItemByLine = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('remove-item-by-line', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { target: e.target } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    return html`{% render 'cart-form-b' %}`
+  }
+  
+  customElements.define('cart-form-b', component(cartFormB, {observedAttributes: ['cart_json', 'cart_updating'], useShadowDOM: false}))
+  
+ 
+  function themeCollectionTemplate({collection_handle, items_per_page, default_sort_by}) {
+    const [productHandles, setProductHandles] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [sortBy, setSortBy] = useState(default_sort_by);
+    const [allTags, setAllTags] = useState([]);
+    const [currentTag, setCurrentTag] = useState(null);
+    const [totalPageNumber, setTotalPageNumber] = useState(null);
+    const numberOfPages = Math.ceil(items_per_page / 20);
+    useEffect(() => {
+      const queryPageArray = (Array(numberOfPages)).fill().map((ele, idx) => idx + 1 + (currentPage-1) * numberOfPages);
+      const queryArray = queryPageArray.map(num => currentTag?axios.get(`/collections/${collection_handle}/${currentTag}?view=theme&page=${num}&sort_by=${sortBy}`).then(result => result.data) : axios.get(`/collections/${collection_handle}?view=theme&page=${num}&sort_by=${sortBy}`).then(result => result.data))
+      Promise.all(queryArray)
+      .then(function(results){
+        setAllTags(results[0].all_tags);
+        setTotalPageNumber(Math.ceil(results[0].products_count/items_per_page));
+        const productHandles = results.reduce(function(acc, cur){
+         return acc.concat(cur.products)
+        }, []);
+        setProductHandles(productHandles);
+      });  
+    }, [currentPage, sortBy, collection_handle, items_per_page, currentTag]);
+    
+    const sortOptions = [
+      {value: "manual", label: "Featured"}, 
+      {value: "best-selling", label: "Best selling"}, 
+      {value: "title-ascending", label: "Alphabetically, A-Z"},
+      {value: "title-descending", label: "Alphabetically, Z-A"},
+      {value: "price-ascending", label: "Price, low to high"},
+      {value: "price-descending", label: "Price, high to low"},
+      {value: "created-ascending", label: "Date, old to new"},
+      {value: "created-descending", label: "Date, new to old"}
+    ];
+    
+    const goToPreviousPage = (e) => {
+      e.preventDefault;
+      if(currentPage > 1) {
+        const newPage = currentPage - 1;
+        setCurrentPage(newPage)
+      }
+    }
+    
+    const goToNextPage = (e) => {
+      e.preventDefault;
+      if(currentPage < totalPageNumber) {
+        const newPage = currentPage + 1;
+        setCurrentPage(newPage)
+      }
+    }
+    
+    const goToSpecificPage = (page, e) => {
+      e.preventDefault;
+      if(page < totalPageNumber && page > 1) {
+        setCurrentPage(page)
+      }
+    }
+    
+    const changeTag = (e) => {
+      const target = e.target;
+      if(target && target.value) {
+      	if(target.value == "All") {
+      	  setCurrentTag(null);
+      	} else {
+		  setCurrentTag(target.value);
+      	}
+      }
+    }
+    
+    const changeSortBy = (e) => {
+      const target = e.target;
+      if(target && target.value) {
+        setSortBy(target.value);
+      }
+    }
+    
+    return html`{% render 'theme-collection-template' %}`;
+  }
+    
+  customElements.define('theme-collection-template', component(themeCollectionTemplate, {observedAttributes: ['collection_handle', 'items_per_page', 'default_sort_by'], useShadowDOM: false}));
+
+  function themeProductGridItem({product_handle}) {
+  
+    const [product, setProduct] = useState(null);
+    const [currentVariant, setCurrentVariant] = useState(null);
+    const [options, setOptions] = useState(null);
+    useEffect(() => {
+      axios.get(`/products/${product_handle}?view=theme`)
+      .then(response => response.data)
+      .then(rawProduct => {
+        const currentVariantId = rawProduct.selected_variant_id?rawProduct.selected_variant_id:rawProduct.first_available_variant_id?rawProduct.first_available_variant_id:null;
+        const currentVariant = !currentVariantId?null:rawProduct.variants.find(variant => variant.id === currentVariantId);
+        const options = rawProduct.options_with_values;
+        delete rawProduct['selected_variant_id'];
+        delete rawProduct['first_available_variant_id']
+        setProduct(rawProduct);
+        setCurrentVariant(currentVariant);
+        setOptions(options);
+      });
+    }, [product_handle]);
+    
+    const addCartFromForm = (e) => {
+      e.preventDefault();
+      const event = new CustomEvent('add-cart-from-form', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        cancelable: true,
+        detail: { form: this.querySelector('form[action="/cart/add"]') } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+    
+    const changeVariantAccordingToOptions = (e) => {
+      const option1 = this.querySelector('select[data-option="option1"]') && this.querySelector('select[data-option="option1"]').value;
+      const option2 = this.querySelector('select[data-option="option2"]') && this.querySelector('select[data-option="option2"]').value;
+      const option3 = this.querySelector('select[data-option="option3"]') && this.querySelector('select[data-option="option3"]').value;
+      const currentVariant = product.variants.find(variant => variant.option1 === option1 && variant.option2 === option2 && variant.option3 === option3);
+      setCurrentVariant(currentVariant);
+    }
+    
+  	return html`{% render 'theme-product-grid-item' %}`  
+  }
+  
+  customElements.define('theme-product-grid-item', component(themeProductGridItem, {observedAttributes: ['product_handle'], useShadowDOM: false}));
+
+</script>
+

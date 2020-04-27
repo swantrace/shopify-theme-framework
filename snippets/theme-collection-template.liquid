@@ -1,0 +1,29 @@
+<header class="section-header section-header--large">
+  <h1 class="section-header__title section-header__title--left">Products</h1>
+  <div class="section-header__link--right">
+    <div class="form-horizontal">
+      <label for="BrowseBy">Browse by</label>
+      <select name="BrowseBy" id="BrowseBy" class="btn--tertiary" @change=${changeTag}>
+        <option>All</option>
+        ${allTags?allTags.map(tag => html`<option value="${tag.handle}">${tag.text}</option>`):""}
+      </select>
+    </div>
+    <div class="form-horizontal">
+      <label for="SortBy">Sort by</label>
+      <select name="sort_by" id="SortBy" class="btn--tertiary" aria-describedby="a11y-refresh-page-message" @change=${changeSortBy}>  
+        ${sortOptions?sortOptions.map(option => html`<option value=${option.value} ?selected=${option.value == default_sort_by}>${option.label}</option>`):""}
+      </select>
+    </div>
+  </div>    
+</header>
+${totalPageNumber?html`<div class="text-center">
+  <ul class="pagination-custom">
+    <li><button ?disabled=${currentPage == 1} @click=${goToPreviousPage}>Previous</button></li>
+      ${Array(totalPageNumber).fill().map((ele, idx) => html`<li class=${currentPage == idx + 1?"active":""}><button @click=${(e) => goToSpecificPage(idx+1, e)}>${idx+1}</button></li>`)}
+    <li><button ?disabled=${currentPage == totalPageNumber} @click=${goToNextPage}>Next</button></li>
+  </ul>
+</div>`:html``}
+<div class="grid-uniform grid-link__container">
+  ${productHandles.map(productHandle => html`<theme-product-grid-item class="grid__item wide--one-fifth large--one-quarter medium-down--one-half" product_handle=${productHandle}></theme-product-grid-item>`)}
+</div>
+<hr class="hr--cleaer">

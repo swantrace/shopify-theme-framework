@@ -1,0 +1,31 @@
+<div>
+  <h1>${product && product.title}</h1>
+  <div>
+    <p>Price: ${currentVariant && currentVariant.price}</p>
+  </div>
+  <form method="post" action="/cart/add" id="product_form_${product && product.id}" accept-charset="UTF-8" class="product-form--wide" enctype="multipart/form-data">
+    <input type="hidden" name="form_type" value="product">
+    <input type="hidden" name="utf8" value="✓">
+    <input style="display: none;" name="id" value="${currentVariant && currentVariant.id}" />
+    ${product && !product.has_only_default_variant?html`${options.map((option, index) => html`
+      <div class="selector-wrapper">
+        <label for="productSelect-option-${index}">${option.name}</label>
+        <select @change=${changeVariantAccordingToOptions} class="single-option-selector" data-option="option${option.position}" id="ProductSelect-product-template-option-${index}">
+          ${option.values.map(value => html`<option value="${value}">${value}</option>`)}
+        </select>
+      </div>`)}`:html``}
+    <div class="product-single__quantity">
+      <label for="Quantity">Quantity</label>
+      <input type="number" id="Quantity" name="quantity" value="1" min="1" class="quantity-selector">
+    </div>
+    <button @click=${addCartFromForm} 
+            type="submit" 
+            name="add" 
+            id="AddToCart" 
+            class="btn btn--wide btn--secondary"
+            ?disabled="${cart_updating || !currentVariant}"
+            >
+      <span id="AddToCartText">Add to Cart</span>
+    </button>
+  </form>
+</div>

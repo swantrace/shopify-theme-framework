@@ -1,0 +1,338 @@
+  const fragmentFromString = str => document.createRange().createContextualFragment(str);
+  window.fragmentFromString = fragmentFromString;
+
+  function watchDocument(selector) {
+    return new Promise(function(resolve, reject){
+      sentinel.on(selector, resolve);
+    });
+  }
+
+  function documentQuerySelectorEach(selector, callback) {
+    Array.from(document.querySelectorAll(selector)).forEach(callback)
+    watchDocument(selector)
+    .then(function handleElement(e){
+      callback(e);
+      watchDocument(selector)
+      .then(handleElement);
+    });
+  }
+  
+  function onceAttributesChanged(element, filterRules = {}) {  
+    return new Promise(function(resolve, reject){
+      var target = element;
+      var config = { attributes: true, attributeOldValue: true };
+
+      Object.keys(filterRules).forEach(function(key){
+        config.attributeFilter = config.attributeFilter || [];
+        config.attributeFilter.push(key);
+      });
+
+      var mutationObserver = new MutationObserver(function(mutationRecords){
+
+        // console.log(mutationRecords);
+
+        var ruleMetMutation = mutationRecords.find(function(record){
+          var target = record.target;
+          var attributeName = record.attributeName;
+          var attributetCurrentValue = target.getAttribute(attributeName);
+          var regex = filterRules[attributeName] instanceof RegExp?filterRules[attributeName]:/.*/g
+          return attributetCurrentValue == null || attributetCurrentValue.match(regex);
+        });
+
+        if(ruleMetMutation) {
+          var otherMutations = mutationObserver.takeRecords();
+          mutationObserver.disconnect();
+          mutationObserver = null;
+          resolve({ruleMetMutation: ruleMetMutation, otherMutations: otherMutations});
+        }        
+      });
+      mutationObserver.observe(target, config);
+    });
+  }
+
+  function onAttributesChanged(element, filterRules = {}, callback) { 
+    onceAttributesChanged(element, filterRules)
+    .then(function handleMutations(mutationsInfo){    	
+      callback(mutationsInfo)
+      .then(function(){      
+        onceAttributesChanged(element, filterRules)
+        .then(handleMutations)
+      })
+    })
+
+  }
+
+  
+  documentQuerySelectorEach('[data-haunted-test]', function(element){
+    //  console.log("added custom element:", element);
+    onAttributesChanged(element, {}, function({ruleMetMutation, otherMutations}){
+      return new Promise(function(resolve, reject){
+        //  console.log("changed attribute:", {
+        //    attributeName: ruleMetMutation.attributeName, 
+        //    oldValue: ruleMetMutation.oldValue, 
+        //    newValue: ruleMetMutation.target[ruleMetMutation.attributeName]
+        //  });
+        resolve();
+      })   
+    })
+  });
+
+  
+  // test 1: basic
+  
+  function HelloName({ name }) {
+    return html`<span class="red-name">Hello ${name}<button>Click Me</button></span>`;
+  }
+  
+  customElements.define('hello-name', component(HelloName, {observedAttributes: ['name'], useShadowDOM: false}));
+  
+  // document.body.appendChild(fragmentFromString('<hello-name data-haunted-test name="Qixuan"></hello-name>'))
+  
+  //  document.querySelector("hello-name").setAttribute("name", "Fred")
+  // test 1
+  
+  
+  // test 2: nested components
+  
+  function Profile({ userData }) {
+    return html`
+      <section>
+        <h2>Profile</h2>
+        <article>
+          <figure>
+            <img src=${userData.portrait} alt="user portait" />
+            <figcaption>${userData.name}</figcaption>
+          </figure>
+          <p>${userData.bio}</p>
+          <p>Mood: ${userData.mood}</p>
+        </article>
+      </section>
+    `;
+  }
+
+  customElements.define('my-profile', component(Profile));
+
+  function ProfileWrapper({mood}) {
+    const userData = {
+      mood: mood,
+      portrait: 'https://source.unsplash.com/random',
+      name: '洪启轩',
+      bio: '这个人很懒，什么都没有留下'
+    };
+
+    return html`
+      <my-profile .userData=${userData}></my-profile>
+    `;
+  }
+  
+  customElements.define('profile-wrapper', component(ProfileWrapper, { observedAttributes: ['mood']}));
+  
+  // document.body.appendChild(fragmentFromString('<profile-wrapper data-haunted-test mood="Happy"></profile-wrapper>'));
+  
+  // document.querySelector("profile-wrapper").setAttribute("mood", "Sorrow")
+  // test 2
+  
+  // test 3: dispatch event
+  
+  function Product({ name, price, productId }) {
+    const buyProduct = () => {
+      const event = new CustomEvent('buy-product', {
+        bubbles: true, // this let's the event bubble up through the DOM
+        composed: true, // this let's the event cross the Shadow DOM boundary
+        detail: { productId } // all data you wish to pass must be in `detail`
+      });
+      this.dispatchEvent(event);
+    }
+
+    return html`
+      <article>
+        <h3>${name}</h3>
+        <p>Price: ${price} USD</p>
+        <button @click=${buyProduct}>Purchase</button>
+      </article>
+    `;
+  }
+
+  customElements.define('store-product', component(Product, {observedAttributes: ['name', 'price', 'product-id']}));
+  
+  function Store() {
+    return html`
+      <store-product
+        name="T-Shirt"
+        price="10.00"
+        product-id="123456"
+        @buy-product=${event => {
+          console.log('We can listen to the event on <store-product> itself 🙂')
+          console.log('inner:', event);
+          console.log("\n------------------------")
+        }}
+      ></store-product>
+    `;
+  }
+
+  customElements.define('my-store', component(Store));
+  
+  function StoreWrapper() {
+    useEffect(() => {
+      const handleReportProduct = event => {
+        console.log('Because the event bubbled all the way up here,');
+        console.log('we can listen directly on <store-wrapper> element! 🎉');
+        console.log('outer:', event);
+        console.log("\n------------------------")
+      };
+      this.addEventListener('buy-product', handleReportProduct);
+
+      return () => {
+        // very important to remove the event listener!
+        this.removeEventListener('buy-product', handleReportProduct);
+      }
+    }, []); // make sure you list all dependencies
+
+    return html`<my-store></my-store>`;
+  }
+  
+  customElements.define('store-wrapper', component(StoreWrapper))
+
+  
+  // document.body.appendChild(fragmentFromString('<store-wrapper data-haunted-test></store-wrapper>'));
+  
+  // test 3
+  
+  
+  // test 4: Virtual components
+  
+ 
+  const Counter = virtual(() => {
+  const [count, setCount] = useState(0);
+
+  return html`
+    <button type="button" @click=${() => setCount(count + 1)}>
+      ${count}
+    </button>
+    `;
+  });
+
+  function CounterWrapper() {
+    return html`
+      <div>
+        <h1>My Counter</h1>
+        ${Counter()}
+      </div>
+    `;
+  }
+
+  customElements.define('counter-wrapper', component(CounterWrapper));
+  // document.body.appendChild(fragmentFromString('<counter-wrapper data-haunted-test></counter-wrapper>'));
+  
+  // test 4: useEffect
+  
+ 
+  function CounterUseEffect() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      // on every render, a new number will be in the title
+      document.title = `${Math.random()}`;
+    });
+    
+    useEffect(() => {
+      // only run once
+      // alert('I will stay like this until someone changes me');
+    }, []);
+    
+
+    return html`
+      <div id="count">${count}</div>
+      <button type="button" @click=${() => setCount(count + 1)}>
+        Cause rerender
+      </button>
+    `;
+  }
+  
+  customElements.define('counter-use-effect', component(CounterUseEffect))
+  // document.body.appendChild(fragmentFromString('<counter-use-effect data-haunted-test></counter-use-effect>'));
+ 
+  
+  // test 4
+  
+  // test 5: slot
+ 
+  function CartWrapper({cart}) {
+    const cartObj = JSON.parse(cart);
+    return html`<div class="cart-wrapper">
+      <slot name="cart-title"></slot>
+  	  <h1>${cartObj.token}</h1>
+    </div>`;
+  }
+  customElements.define('cart-wrapper', component(CartWrapper, {observedAttributes: ['cart']}))
+  // document.body.appendChild(fragmentFromString('<cart-wrapper data-haunted-test cart="{{ cart | json | escape }}"><h1 slot="cart-title">This is The Cart</h1></cart-wrapper>'));
+  
+  
+  // test 6: useReduce
+  
+  const initialState = { count: 0 };
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case 'reset':
+        return initialState;
+      case 'increment':
+        return { count: state.count + 1 };
+      case 'decrement':
+        return { count: state.count - 1 };
+    }
+  }
+
+  function CounterUseReducer1() {
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    return html`
+      Count: ${state.count}
+      <button @click=${() => dispatch({ type: 'reset' })}>
+        Reset
+      </button>
+      <button @click=${() => dispatch({ type: 'increment' })}>+</button>
+      <button @click=${() => dispatch({ type: 'decrement' })}>-</button>
+    `;
+  }
+  
+  customElements.define('counter-use-reducer-1', component(CounterUseReducer1))
+  
+  function CounterUseReducer2() {
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    return html`
+      Count: ${state.count}
+      <button @click=${() => dispatch({ type: 'reset' })}>
+        Reset
+      </button>
+      <button @click=${() => dispatch({ type: 'increment' })}>+</button>
+      <button @click=${() => dispatch({ type: 'decrement' })}>-</button>
+    `;
+  }
+  
+  customElements.define('counter-use-reducer-2', component(CounterUseReducer2))
+  // document.body.appendChild(fragmentFromString('<counter-use-reducer-1></counter-use-reducer-1><hr/><counter-use-reducer-2></counter-use-reducer-2>'));
+
+  // test7: useMemo
+  function fibonacci(num) {
+    if (num <= 1) return 1;
+    return fibonacci(num - 1) + fibonacci(num - 2);
+  }
+
+  function UseMemoTest() {
+    const [value, setVal] = useState(12);
+    const fib = useMemo(() => fibonacci(value), [value]);
+
+    return html`
+      <h1>Fibonacci</h1>
+      <input
+        type="text"
+        @change=${event => setVal(parseInt(event.target.value, 10))}
+        value=${value}
+      />
+      <div>Fibonacci <strong>${fib}</strong></div>
+    `;
+  }
+  // customElements.define('use-memo-test', component(UseMemoTest))
+  // document.body.appendChild(fragmentFromString('<use-memo-test></use-memo-test>'));

@@ -113,6 +113,84 @@ export default async () => {
           context.commit("setCartIsUpdating", false);
         });
     },
+    addItem(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .addItem({
+          data: {
+            id: payload.id,
+            quantity: payload.quantity,
+            properties: payload.properties,
+          },
+        })
+        .then(apis.getCart)
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    changeItemByLine(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .changeItem({
+          data: { line: payload.line, quantity: payload.quantity },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    changeItemByKey(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .changeItem({
+          data: { id: payload.key, quantity: payload.quantity },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    updateCartFromForm(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .updateCart({
+          data: new FormData(payload),
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    updateCartAttributes(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .updateCart({
+          data: { attributes: payload },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    updateCartNote(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .updateCart({
+          data: { note: payload },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    clearCart(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis.clearCart().then((cart) => {
+        context.commit("setCart", cart);
+        context.commit("setCartIsUpdating", false);
+      });
+    },
   };
 
   const mutations = {

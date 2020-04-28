@@ -33,6 +33,8 @@ export default async () => {
     const fn = ({
       baseURL = null,
       handle = null,
+      blog_handle = null,
+      tags = null,
       view = null,
       params = {},
       data = {},
@@ -62,8 +64,14 @@ export default async () => {
         responseInterceptor,
         responseInterceptorError
       );
+      if (typeof blog_handle === "string") {
+        url = url.replace("[blog_handle]", blog_handle);
+      }
       if (typeof handle === "string") {
         url = url.replace("[handle]", handle);
+      }
+      if (typeof tags === "string") {
+        url = url.replace("[tags]", tags);
       }
       if (typeof view === "string") {
         params = { ...params, view };
@@ -75,7 +83,11 @@ export default async () => {
       const transformResponse = [
         (data) => {
           if (typeof data === "string") {
-            data = JSON.parse(data);
+            try {
+              data = JSON.parse(data);
+            } catch (err) {
+              data = data;
+            }
           }
           return data;
         },
@@ -132,6 +144,51 @@ export default async () => {
     url: "/products.json",
   });
 
+  const getShippingRates = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/shipping_rates.json",
+  });
+
+  const getProductRecommendations = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/recommendations/products.json",
+  });
+
+  const getPredictSearch = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/search/suggest.json",
+  });
+
+  const getSearch = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/search",
+  });
+
+  const getCollection = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/collections/[handle]",
+  });
+
+  const getBlog = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/blogs/[handle]",
+  });
+
+  const getArticle = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/blogs/[blog_handle]/[handle]",
+  });
+
+  const getPage = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/pages/[handle]",
+  });
+
+  const getCollections = ajaxFunctionPromiseCreator({
+    method: "get",
+    url: "/collections",
+  });
+
   return {
     getCart,
     getProduct,
@@ -140,66 +197,14 @@ export default async () => {
     updateCart,
     clearCart,
     getProducts,
+    getShippingRates,
+    getProductRecommendations,
+    getPredictSearch,
+    getSearch,
+    getCollection,
+    getBlog,
+    getArticle,
+    getPage,
+    getCollections,
   };
 };
-
-// export const getAllProducts = function () {
-//   return "hello world!";
-// };
-// export const getCollectionProducts = function () {
-//   return "hello world!";
-// };
-// export const updateCartFromForm = function () {
-//   return "hello world!";
-// };
-// export const updateCartAttributes = function () {
-//   return "hello world!";
-// };
-// export const updateCartNote = function () {
-//   return "hello world!";
-// };
-// export const getArticle = function () {
-//   return "hello world!";
-// };
-// export const getBlogArticles = function () {
-//   return "hello world!";
-// };
-// export const getPage = function () {
-//   return "hello world!";
-// };
-// export const getSearchResults = function () {
-//   return "hello world!";
-// };
-// export const getPredictSearch = function () {
-//   return "hello world!";
-// };
-// export const getProductRecommendations = function () {
-//   return "hello world!";
-// };
-
-// export default {
-//   getCartCreator,
-//   getAllProducts,
-//   getArticle,
-//   getBlogArticles,
-//   getPage,
-//   getCollectionProducts,
-//   getPredictSearch,
-//   getProductCreator,
-//   getProductRecommendations,
-//   getSearchResults,
-//   getAllProducts,
-//   addItemCreator,
-//   addItemFromForm,
-//   addItems,
-//   updateCartAttributes,
-//   updateCartFromForm,
-//   updateCartNote,
-//   changeItemByKey,
-//   changeItemByLine,
-//   changeItemByVariantId,
-//   removeItemByKey,
-//   removeItemByLine,
-//   removeItemByVariantId,
-//   clearCart,
-// };

@@ -1,103 +1,48 @@
 import ajaxAPIsCreator from "./ajax";
-import isEqual from "lodash.isequal";
 import { encodedStr } from "./helpers";
-
-window[window.themeName] = window[window.themeName] || {};
-window[window.themeName].ajax = window[window.themeName].ajax || {};
-window[window.themeName].store = window[window.themeName].store || {};
-
-class Store {
-  constructor(params) {
-    const self = this;
-    self.actions = {};
-    self.mutations = {};
-    self.state = {};
-    self.status = "resting";
-    self.callbacks = [];
-    if (params.hasOwnProperty("actions")) {
-      self.actions = params.actions;
-    }
-
-    if (params.hasOwnProperty("mutations")) {
-      self.mutations = params.mutations;
-    }
-
-    self.state = new Proxy(params.initialState || {}, {
-      set: function (state, key, value) {
-        const oldValue = state[key];
-        state[key] = value;
-        if (!isEqual(oldValue, value)) {
-          self.processCallbacks(key, value, oldValue);
-        }
-        self.status = "resting";
-        return true;
-      },
-    });
-  }
-
-  dispatch(actionKey, payload) {
-    const self = this;
-    if (typeof self.actions[actionKey] !== "function") {
-      console.error(`Action "${actionKey}" doesn't exist.`);
-      return false;
-    }
-    self.status = "action";
-    self.actions[actionKey](self, payload);
-    return true;
-  }
-
-  commit(mutationKey, payload) {
-    const self = this;
-    if (typeof self.mutations[mutationKey] !== "function") {
-      console.log(`Mutation "${mutationKey}" doesn't exist`);
-      return false;
-    }
-    self.status = "mutation";
-    let newState = self.mutations[mutationKey](self.state, payload);
-    self.state = Object.assign(self.state, newState);
-    return true;
-  }
-
-  processCallbacks(key, value, oldValue) {
-    const self = this;
-    if (!self.callbacks.length) {
-      return false;
-    }
-    self.callbacks.forEach((callback) => callback(key, value, oldValue));
-    return true;
-  }
-
-  subscribe(callback) {
-    const self = this;
-    if (typeof callback !== "function") {
-      console.error(
-        "You can only subscribe to Store changes with a valid function"
-      );
-      return false;
-    }
-    self.callbacks.push(callback);
-    return true;
-  }
-}
+import Store from "./Store";
 
 export default async () => {
   const apis = await ajaxAPIsCreator();
-  window[window.themeName].ajax = apis;
+  const template = window[window.themeName].template;
+  const canonical_url = window[window.themeName].canonical_url;
 
-  const initialCart = await apis.getCart();
-  const initialProducts = [];
-  const initialState = {
-    cart: initialCart,
-    products: initialProducts,
+  // const initialCart = await apis.getCart();
+  // const initialProducts = [];
+  // const initialState = {
+  //   cart: initialCart,
+  //   collection:
+  //     window[window.themeName].current_page_info.template === "collection"
+  //       ? window[window.themeName].current_page_info
+  //       : null,
+  //   cart_is_updating: false,
+  //   collection_is_updating: false,
+  // };
+  let initialState = {
+    cart: null,
     cart_is_updating: false,
   };
+
+  switch (template) {
+    case "collection":
+      initialState = Object.assign(initialState, {
+        collection: null,
+        collection_is_updating: false,
+      });
+      break;
+
+    default:
+      break;
+  }
 
   const actions = {
     addItems(context, payload) {
       context.commit("setCartIsUpdating", true);
       apis
         .addItem({ data: { items: payload } })
-        .then(apis.getCart)
+        .then(function (items) {
+          return apis.getCart();
+        })
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
@@ -107,7 +52,9 @@ export default async () => {
       context.commit("setCartIsUpdating", true);
       apis
         .addItem({ data: new FormData(payload) })
-        .then(apis.getCart)
+        .then(function (items) {
+          return apis.getCart();
+        })
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
@@ -123,7 +70,9 @@ export default async () => {
             properties: payload.properties,
           },
         })
-        .then(apis.getCart)
+        .then(function (items) {
+          return apis.getCart();
+        })
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
@@ -145,6 +94,28 @@ export default async () => {
       apis
         .changeItem({
           data: { id: payload.key, quantity: payload.quantity },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    removeItemByLine(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .changeItem({
+          data: { line: payload, quantity: 0 },
+        })
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        });
+    },
+    removeItemByKey(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis
+        .changeItem({
+          data: { id: payload, quantity: 0 },
         })
         .then((cart) => {
           context.commit("setCart", cart);
@@ -191,6 +162,156 @@ export default async () => {
         context.commit("setCartIsUpdating", false);
       });
     },
+    changeCollectionTags(context, payload) {
+      if (context.state.collection) {
+        context.commit("setCollectionTags", payload);
+        context.commit("setCollectionIsUpdating", true);
+        let tags, params;
+        if (
+          context.state.collection.handle === "types" ||
+          context.state.collection.handle === "vendors"
+        ) {
+          params = {
+            q: context.state.collection.title,
+            constraint: payload,
+            page: context.state.collection.page,
+            sort_by: context.state.collection.sort_by,
+          };
+        } else {
+          tags = payload;
+          params = {
+            page: context.state.collection.page,
+            sort_by: context.state.collection.sort_by,
+          };
+        }
+        apis
+          .getCollection({
+            handle: context.state.collection.handle,
+            view: "theme",
+            params,
+            tags,
+          })
+          .then(({ products }) => {
+            context.commit("setCollectionProducts", products);
+            context.commit("setCollectionIsUpdating", false);
+          });
+      }
+    },
+    changeCollectionPage(context, payload) {
+      if (context.state.collection) {
+        context.commit("setCollectionPage", payload);
+        context.commit("setCollectionIsUpdating", true);
+        let tags, params;
+        if (
+          context.state.collection.handle === "types" ||
+          context.state.collection.handle === "vendors"
+        ) {
+          params = {
+            q: context.state.collection.title,
+            constraint: context.state.collection.tags,
+            page: payload,
+            sort_by: context.state.collection.sort_by,
+          };
+        } else {
+          tags = context.state.collection.tags;
+          params = {
+            page: payload,
+            sort_by: context.state.collection.sort_by,
+          };
+        }
+        apis
+          .getCollection({
+            handle: context.state.collection.handle,
+            view: "theme",
+            params,
+            tags,
+          })
+          .then(({ products }) => {
+            context.commit("setCollectionProducts", products);
+            context.commit("setCollectionIsUpdating", false);
+          });
+      }
+    },
+    changeCollectionSortBy(context, payload) {
+      if (context.state.collection) {
+        context.commit("setCollectionSortBy", payload);
+        context.commit("setCollectionIsUpdating", true);
+        let tags, params;
+        if (
+          context.state.collection.handle === "types" ||
+          context.state.collection.handle === "vendors"
+        ) {
+          params = {
+            q: context.state.collection.title,
+            constraint: context.state.collection.tags,
+            page: context.state.collection.page,
+            sort_by: payload,
+          };
+        } else {
+          tags = context.state.collection.tags;
+          params = {
+            page: context.state.collection.page,
+            sort_by: payload,
+          };
+        }
+        apis
+          .getCollection({
+            handle: context.state.collection.handle,
+            view: "theme",
+            params,
+            tags,
+          })
+          .then(({ products }) => {
+            context.commit("setCollectionProducts", products);
+            context.commit("setCollectionIsUpdating", false);
+          });
+      }
+    },
+    changeCollectionViewType(context, payload) {
+      if (context.state.collection) {
+        context.commit("setCollectionViewType", payload);
+      }
+    },
+    initiate(context, payload) {
+      context.commit("setCartIsUpdating", true);
+      apis.getCart().then((cart) => {
+        context.commit("setCart", cart);
+        context.commit("setCartIsUpdating", false);
+      });
+      if (context.state.collection) {
+        context.commit("setCartIsUpdating", true);
+        context.commit("setCollectionIsUpdating", true);
+        let tags, params;
+        if (
+          context.state.collection.handle === "types" ||
+          context.state.collection.handle === "vendors"
+        ) {
+          params = {
+            q: context.state.collection.title,
+            constraint: context.state.collection.tags,
+            page: context.state.collection.page,
+            sort_by: context.state.collection.sort_by,
+          };
+        } else {
+          tags = context.state.collection.tags;
+          params = {
+            page: context.state.collection.page,
+            sort_by: context.state.collection.sort_by,
+          };
+        }
+        apis
+          .getCollection({
+            handle: context.state.collection.handle,
+            view: "theme",
+            params,
+            tags,
+          })
+          .then((products) => {
+            context.commit("setCollectionProducts", products);
+            context.commit("setCollectionIsUpdating", false);
+          });
+      }
+    },
   };
 
   const mutations = {
@@ -202,23 +323,43 @@ export default async () => {
       state.cart_is_updating = payload;
       return state;
     },
-    setProducts(state, payload) {
-      state.products = products;
+    setCollectionTags(state, payload) {
+      state.collection = { ...state.collection, tags: payload };
+      return state;
+    },
+    setCollectionPage(state, payload) {
+      state.collection = { ...state.collection, page: payload };
+      return state;
+    },
+    setCollectionSortBy(state, payload) {
+      state.collection = { ...state.collection, sort_by: payload };
+      return state;
+    },
+    setCollectionProducts(state, payload) {
+      state.collection = { ...state.collection, products: payload };
+      return state;
+    },
+    setCollectionViewType(state, payload) {
+      state.collection = { ...state.collection, view_type: payload };
+      return state;
+    },
+    setCollectionIsUpdating(state, payload) {
+      state.collection_is_updating = payload;
       return state;
     },
   };
 
-  const storeInstance = new Store({
+  const store = new Store({
     actions,
     mutations,
     initialState,
   });
 
-  storeInstance.subscribe(function (key, newValue, oldValue) {
-    switch (key) {
+  store.subscribe(function (keysArr, newValue, oldValue) {
+    switch (keysArr[0]) {
       case "cart_is_updating":
-        if (typeof window[themeName].cartChangerDisableFn === "function") {
-          window[themeName].cartChangerDisableFn();
+        if (typeof window[themeName].onCartIsUpdatingChanged === "function") {
+          window[themeName].onCartIsUpdatingChanged(newValue);
         } else {
           if (newValue === true) {
             document
@@ -236,21 +377,172 @@ export default async () => {
         }
         break;
       case "cart":
-        document
-          .querySelectorAll(`[${window["themeName"]}-cart-form]`)
-          .forEach((el) => {
-            el.setAttribute(
-              "old_cart_json",
-              encodedStr(JSON.stringify(oldValue))
-            );
-            el.setAttribute("cart_json", encodedStr(JSON.stringify(newValue)));
-          });
+        if (typeof window[themeName].onCartChanged === "function") {
+          window[themeName].onCartChanged(newValue, oldValue);
+        } else {
+          document
+            .querySelectorAll(`[${window["themeName"]}-cart-form]`)
+            .forEach((el) => {
+              el.setAttribute(
+                "old_cart_json",
+                encodedStr(JSON.stringify(oldValue))
+              );
+              el.setAttribute(
+                "cart_json",
+                encodedStr(JSON.stringify(newValue))
+              );
+            });
+        }
+        break;
+      case "collection":
+        switch (keysArr[1]) {
+          case "tags":
+            if (typeof window[themeName].onTagsChanged === "function") {
+              window[themeName].onTagsChanged(newValue.tags);
+            } else {
+              if (typeof newValue.tags === "string") {
+                document
+                  .querySelectorAll(
+                    `[${window["themeName"]}-collection-tags-filter]`
+                  )
+                  .forEach((el) => {
+                    el.setAttribute("tags", newValue.tags);
+                  });
+              } else {
+                throw new Error("tags' value has to be a string");
+              }
+            }
+            break;
+          case "page":
+            if (typeof window[themeName].onPageChanged === "function") {
+              window[themeName].onPageChanged(
+                newValue.page,
+                newValue.products_count,
+                items_per_page
+              );
+            } else {
+              if (typeof newValue.page === "number") {
+                document
+                  .querySelectorAll(
+                    `[${window["themeName"]}-collection-page-controller]`
+                  )
+                  .forEach((el) => {
+                    el.setAttribute("current_page", newValue.page);
+                    el.setAttribute("products_count", newValue.products_count);
+                    el.setAttribute("items_per_page", newValue.items_per_page);
+                  });
+              } else {
+                throw new Error("page' value has to be a number");
+              }
+            }
+            break;
+          case "sort_by":
+            if (typeof window[themeName].onSortByChanged === "function") {
+              window[themeName].onSortByChanged(newValue.sort_by);
+            } else {
+              if (
+                [
+                  "manual",
+                  "best-selling",
+                  "title-ascending",
+                  "title-descending",
+                  "price-ascending",
+                  "price-descending",
+                  "created-ascending",
+                  "created-descending",
+                ].includes(newValue.sort_by)
+              ) {
+                document
+                  .querySelectorAll(
+                    `[${window["themeName"]}-collection-sort-by-controller]`
+                  )
+                  .forEach((el) => {
+                    el.setAttribute("sort_by", newValue.sort_by);
+                  });
+              } else {
+                throw new Error(
+                  '"sort_by" value has to be one of ["manual","best-selling","title-ascending","title-descending","price-ascending","price-descending","created-ascending","created-descending"]'
+                );
+              }
+            }
+            break;
+          case "products":
+            if (
+              typeof window[themeName].onCollectionProductsChanged ===
+              "function"
+            ) {
+              window[themeName].onCollectionProductsChanged(
+                newValue.products,
+                newValue.page,
+                newValue.view_type
+              );
+            } else {
+              if (newValue.products instanceof Array) {
+                document
+                  .querySelectorAll(
+                    `[${window["themeName"]}-collection-products-list]`
+                  )
+                  .forEach((el) => {
+                    el.setAttribute("products_handles", newValue.products);
+                    el.setAttribute("current_page", newValue.page);
+                    el.setAttribute("view_type", newValue.view_type);
+                  });
+              } else {
+                throw new Error('"products" value has to be an array');
+              }
+            }
+            break;
+          case "view_type":
+            if (typeof window[themeName].onViewTypeChanged === "function") {
+              window[themeName].onViewTypeChanged(newValue.view_type);
+            } else {
+              if (["list, grid"].includes(newValue.view_type)) {
+                document
+                  .querySelectorAll(
+                    `[${window["themeName"]}-collection-products-list], [${window["themeName"]}-collection-products-item]`
+                  )
+                  .forEach((el) => {
+                    el.setAttribute("view_type", newValue.view_type);
+                  });
+              } else {
+                throw new Error(
+                  '"view_type" value has to be one of ["list", "grid"]'
+                );
+              }
+            }
+            break;
+          default:
+            break;
+        }
+      case "collection_is_updating":
+        if (
+          typeof window[themeName].onCollectionIsUpdatingChanged === "function"
+        ) {
+          window[themeName].onCollectionIsUpdatingChanged(newValue);
+        } else {
+          if (newValue === true) {
+            document
+              .querySelectorAll(
+                `[${window["themeName"]}-collection-tags-filter]`
+              )
+              .forEach((el) => el.setAttribute("collection_is_updating", ""));
+          } else {
+            document
+              .querySelectorAll(
+                `[${window["themeName"]}-atc-form], [${window["themeName"]}-cart-form]`
+              )
+              .forEach((el) => el.removeAttribute("collection_is_updating"));
+          }
+        }
         break;
       default:
         break;
     }
   });
 
-  window[window.themeName].store = storeInstance;
-  return storeInstance;
+  // may not be necessary in the future
+  window[window.themeName].store = store;
+  window[window.themeName].ajax = apis;
+
+  return { store, apis };
 };

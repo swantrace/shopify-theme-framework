@@ -1,4 +1,4 @@
-const throwIfMissing = function (name) {
+const throwIfMissing = (name) => {
   throw new Error("Missing parameter: " + name);
 };
 

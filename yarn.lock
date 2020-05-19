@@ -1536,11 +1536,6 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
-lodash.isequal@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
-  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
-
 lodash@^4.17.11:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
@@ -1823,6 +1818,11 @@ object.pick@^1.3.0:
   integrity sha1-h6EKxMFpS9Lhy/U1kaZhQftd10c=
   dependencies:
     isobject "^3.0.1"
+
+odiff@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/odiff/-/odiff-1.4.0.tgz#b70112e813ebc244ff4e395118d9b72a27de9d8b"
+  integrity sha512-+serfEiFyvDEPKlmvunntssDUzmPpmF6k9L8EsV1iG6LR+TmeiHiyXL51nXkA65kawcz2kpSloZ3NjvhTDX6nw==
 
 once@^1.3.0, once@^1.3.1, once@^1.4.0:
   version "1.4.0"

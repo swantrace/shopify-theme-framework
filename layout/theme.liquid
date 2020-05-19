@@ -52,7 +52,6 @@
 
   <body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ request.page_type | handle }}">
     {% section 'header' %}
-
     <main class="wrapper main-content" role="main">
        <div class="grid">
         <div class="grid__item">
@@ -96,6 +95,7 @@
     </ul>
 
     {% render 'haunted_test' %}
+    {% render 'theme-elements'%}
     {{ 'theme.js' | asset_url | script_tag }}
   </body>
 </html>

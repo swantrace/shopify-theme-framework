@@ -28,11 +28,11 @@
 {%- endif -%}
 
 <script>
-  $(function() {
+  {% comment %} $(function() {
     $('#BrowseBy')
       .bind('change', function() {
         location.href = jQuery(this).val();
       }
     );
-  });
+  }); {% endcomment %}
 </script>

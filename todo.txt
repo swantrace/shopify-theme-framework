@@ -313,6 +313,241 @@ One product that has multiple product options
 One product that has variant images
 
 
+getCart, return
+{
+  attributes: object,
+  cart_level_discount_applications: array
+  currency: string,
+  item_count: number,
+  items_subtotal_price: number,
+  note: string,
+  original_total_price: number,
+  requires_shipping: boolean,
+  token: string,
+  total_disount: number,
+  total_price: number,
+  total_weight: number,
+  items: array of object{
+    discounted_price: number,
+    discounts: array,
+    featured_image: objet,
+    final_line_price: number,
+    final_pfice,
+    gift_card: boolean,
+    grams: number,
+    handle: string,
+    id: number,
+    image: string,
+    key: string,
+    line_level_discount_allocations: array,
+    line_level_total_disount: number,
+    line_price: number,
+    options_with_values: array of object {
+      name: string,
+      value: string
+    },
+    original_line_price: number,
+    original_price: number,
+    price: number,
+    product_description: string,
+    produt_has_only_default: boolean,
+    product_id: number,
+    produt_title: string,
+    produt_type: string,
+    properties: object,
+    quantity: number,
+    require_shipping: boolean,
+    sku: string,
+    taxable: boolean,
+    title: string,
+    total_disount: number,
+    url: string,
+    variant_id: number,
+    variant_options: array,
+    variant_title: string
+    vendor: string
+  }
+}
+
+addItems return
+{
+  items: array of object {
+    discounted_price: number,
+    discounts: array,
+    featured_image: objet {
+      alt: string,
+      aspect_ratio: number,
+      height: number,
+      url: string,
+      width: number
+    },
+    final_line_price: number,
+    final_pfice,
+    gift_card: boolean,
+    grams: number,
+    handle: string,
+    id: number,
+    image: string,
+    key: string,
+    line_level_discount_allocations: array,
+    line_level_total_disount: number,
+    line_price: number,
+    options_with_values: array,
+    original_line_price: number,
+    original_price: number,
+    price: number,
+    product_description: string,
+    produt_has_only_default: boolean,
+    product_id: number,
+    produt_title: string,
+    produt_type: string,
+    properties: object,
+    quantity: number,
+    require_shipping: boolean,
+    sku: string,
+    taxable: boolean,
+    title: string,
+    total_disount: number,
+    url: string,
+    variant_id: number,
+    variant_options: array,
+    variant_title: string
+    vendor: string
+  }
+}
+
+addItem return
+
+{
+    discounted_price: number,
+    discounts: array,
+    featured_image: objet {
+      alt: string,
+      aspect_ratio: number,
+      height: number,
+      url: string,
+      width: number
+    },
+    final_line_price: number,
+    final_pfice,
+    gift_card: boolean,
+    grams: number,
+    handle: string,
+    id: number,
+    image: string,
+    key: string,
+    line_level_discount_allocations: array,
+    line_level_total_disount: number,
+    line_price: number,
+    options_with_values: array,
+    original_line_price: number,
+    original_price: number,
+    price: number,
+    product_description: string,
+    produt_has_only_default: boolean,
+    product_id: number,
+    produt_title: string,
+    produt_type: string,
+    properties: object,
+    quantity: number,
+    require_shipping: boolean,
+    sku: string,
+    taxable: boolean,
+    title: string,
+    total_disount: number,
+    url: string,
+    variant_id: number,
+    variant_options: array,
+    variant_title: string
+    vendor: string
+  }
+
+normal getProduct return
+{
+  available: boolean,
+  compare_at_price: number,
+  compare_at_price_max: number,
+  compare_at_price_min: number,
+  compare_at_price_varies: boolean,
+  created_at: string,
+  description: string,
+  featured_image: string,
+  handle: string,
+  id: number,
+  images: array of string,
+  media: array of object {
+    alt: string,
+    aspect_ratio: number,
+    height: number,
+    id: number,
+    media_type: string,
+    position: number,
+    preview_image: object {
+      aspect_ratio: number,
+      height: number,
+      src: string,
+      width: number
+    }
+  },
+  options: array of object {
+    name: string,
+    position: number,
+    values: string
+  },
+  price: number,
+  price_max: number,
+  price_min: number,
+  price_varies: boolean,
+  published_at: string,
+  tags: array of string,
+  title: string,
+  type: string,
+  url: string,
+  variants: array of object {
+    available: boolean,
+    barcode: string,
+    compare_at_price: number,
+    featured_image: object{
+      alt: null,
+      created_at: string,
+      height: number,
+      id: number,
+      position: number,
+      produt_id: number,
+      src: string,
+      updated_at: string,
+      variant_ids: array of number,
+      width: number
+    },
+    featured_media: object {
+      alt: string,
+      id: number,
+      position: number,
+      preview_image: object {
+        aspect_ratio: number,
+        height: number,
+        src: string,
+        width: number
+      }
+    },
+    id: number,
+    inventory_management: string,
+    name: string,
+    option1: string,
+    option2: string,
+    option3: string,
+    options: array of string,
+    price: number,
+    public_title: string,
+    requires_shipping: boolean,
+    sku: string,
+    taxable: boolean,
+    title: string,
+    weight: number
+  }
+}
+
+
  
 
 

@@ -1,3 +1,4 @@
+{% assign r = "}"%}{% assign l = "{" %}
 <script>
   window.themeName = 'theme';
   window[themeName] = {
@@ -12,6 +13,230 @@
         debug: true
       }
     },
-    all_products_count:  {{ collections.all.all_products_count }}
+    template: {{ template.name | json }},
+    canonical_url: {{ canonical_url | json }},
+    {% capture shop_metafield_names %}{% render 'metafield-keys', type: 'shop' %}{% endcapture %}
+    {% assign shop_metafield_names = shop_metafield_names | strip | split: ","%}
+    {% capture shop_json %}{{l}}
+    "address": {{ shop.address|json }},
+    "collections_count": {{ shop.collections_count | json }},
+    "currency": {{ shop.currency | json }},
+    "enabled_currencies": {{ shop.enabled_currencies | json }}, // to do: json not allowed for this object
+    "description": {{ shop.description | json }},
+    "domain": {{ shop.domain | json}},
+    "email": {{ shop.email | json }},
+    "enabled_payment_types": {{ shop.enabled_payment_types | json }},
+    "locale": {{shop.locale|json}},
+    {% if shop_metafield_names.size > 0 %}"metafields":{{l}}{% for metafield_name in shop_metafield_names %}{{ metafield_name | json }}:{{ shop.metafields[metafield_name] | json }}{% unless forloop.last %},{% endunless %}{% endfor %}{{r}}{% else %}"metafields":{}{% endif %},
+    "money_format": {{shop.money_format|json}},
+    "money_with_currency_format": {{ shop.money_with_currency_format | json }},
+    "name": {{ shop.name | json }},
+    "password_message": {{ shop.password_message | json }},
+    "permanent_domain": {{ shop.permanent_domain | json }},
+    "phone": {{ shop.phone | json }},
+    "policies": {{ shop.policies | json }},
+    "products_count": {{ shop.products_count | json }},
+    "secure_url": {{ shop.secure_url | json }},
+    "taxes_included": {{ shop.taxes_included | json }},
+    "types": {{ shop.types | json }},
+    "url": {{ shop.url | json }},
+    "vendors": {{ shop.vendors | json }},
+    {{r}}{% endcapture %}
+    shop: {{ shop_json }}
+    {% comment %}
+    {% case template.name %}
+    {% when 'collection' %}
+    {% assign collection_json = collection | json %}
+    {% assign collection_json2 = collection_json | split:"" | reverse | join: "" %}
+    {% assign collection_json3 = collection_json2 | remove_first: r %}
+    {% assign collection_json4 = collection_json3 | split: "" | reverse | join: ""%}
+    {% if collection_json4 == "null" %}
+    {% capture collection_json4 %}{{l}}
+    "title": {{ collection.title | json }},
+    "body_html": {{ collection.body_html | json }},
+    "handle": {{ collection.handle | json }},
+    "id": {{ collection.id | json }},
+    "published_at": {{ collection.published_at | json }},
+    "published_scope": {{ collection.published_scope | json }},
+    "sort_order": {{ collection.sort_order | json }},
+    "template_suffix": {{ collection.template_suffix | json }},
+    "updated_at": {{ collection.published_at | json }}
+    {% endcapture %}
+    {% endif %}
+    {% capture other_data %}
+    "template": {{ template.name | json }},
+    "url": {{ canonical_url | json }},
+    "all_products_count": {{ collection.all_products_count | json }},
+    "all_tags": {{ collection.all_tags | json }},
+    "all_types": {{ collection.all_types | json }},
+    "all_vendors": {{ collection.all_vendors | json }},
+    "current_type": {{ collection.current_type | json }},
+    "current_vendor": {{ collection.current_vendor | json }},
+    "default_sort_by": {{ collection.default_sort_by | json }},
+    "description":{{ collection.description | json }},
+    "image":{{ collection.image | json }},
+    "products": [{% paginate collection.products by 20 %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+    "products_count": {{ collection.products_count | json }},
+    "tags": {{ collection.tags | json }},
+    "page": {{ current_page | default: 1 }},
+    "current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
+    "sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
+    {% endcapture%}
+    {% assign collection_json5 = collection_json4 | strip | append: "," | append: other_data | append: r %}
+    {{ collection_json5 }}
+    current_page_info: {{ collection_json5 }}
+    {% when 'product' %}
+    {% capture product_metafield_names %}{% render 'metafield-keys', type: 'product' %}{% endcapture %}
+    {% assign product_metafield_names = product_metafield_names | strip | split: ","%}
+    {% capture variant_metafield_names %}{% render 'metafield-keys', type: 'variant' %}{% endcapture %}
+    {% assign variant_metafield_names = variant_metafield_names | strip | split: ","%}
+    {% assign product_json = product | json %}
+    {% assign product_json2 = product_json | split:"" | reverse | join: "" %}
+    {% assign product_json3 = product_json2 | remove_first: r %}
+    {% assign product_json4 = product_json3 | split: "" | reverse | join: ""%}
+    {% capture other_data %}
+    "template": {{ template.name | json }},
+    "url": {{ canonical_url | json }},
+    "collections": {{ product.collections | json }},
+    "next_product_url": {{ collection.next_product | json }},
+    "previous_product_url": {{ collection.previous_product | json }},
+    "first_available_variant_id": {{ product.first_available_variant.id | json }},
+    "has_only_default_variant": {{ product.has_only_default_variant | json }},
+    "selected_variant_id": {{product.selected_variant.id | json }},
+    "selected_or_first_available_variant_id": {{ product.selected_or_first_available_variant.id | json}},
+    "options_with_values": {{ product.options_with_values | json }},
+    "template_suffix": {{ product.template_suffix | json }},
+    "variants": [
+    {% for variant in product.variants %}
+    {% assign variant_json = variant | json %}
+    {% assign variant_json2 = variant_json | split:"" | reverse | join: "" %}
+    {% assign variant_json3 = variant_json2 | remove_first: r %}
+    {% assign variant_json4 = variant_json3 | split: "" | reverse | join: "" %}
+    {% capture other_variant_data %}
+    "image": {{ variant.image | json }},
+    "incoming": {{ variant.incoming | json }},
+    "next_incoming_date": {{ variant.next_incoming_date | json }},
+    "selected": {{ variant.selected | json }},
+    "variant.unit_price": {{ variant.unit_price | json }},
+    "variant.unit_price_measurement": {{ variant.unit_price_measurement | json }},
+    "url": {{ variant.url | json }},
+    "weight_unit": {{ variant.weight_unit | json }},
+    "weight_in_unit": {{ variant.weight_in_unit | json }}
+    {% if variant_metafield_names.size > 0 %},"metafields": {{l}}{% for metafield_name in variant_metafield_names %}{{ metafield_name | json }}:{{ variant.metafields[metafield_name] | json}}{% unless forloop.last %},{% endunless %}{% endfor %}{{r}}{% else %}{}{% endif %}
+    {% endcapture %}
+    {% assign variant_json5 = variant_json4 | append: "," | append: other_variant_data | append: r %}
+    {{ variant_json5 }}{% unless forloop.last %},{% endunless %}
+    {% endfor %}]
+    {% if product_metafield_names.size > 0 %},"metafields": {{l}}{% for metafield_name in product_metafield_names %}{{ metafield_name | json }}:{{ product.metafields[metafield_name] | json}}{% unless forloop.last %},{% endunless %}{% endfor %}{{r}}{% else %}{}{% endif %}
+    {% endcapture%}
+    {% assign product_json5 = product_json4 | append: "," | append: other_data | append: r %}
+    current_page_info: {{ product_json5 }}
+    {% when 'article' %}
+    {% assign article_json = article | json %}
+    {% assign article_json2 = article_json | split:"" | reverse | join: "" %}
+    {% assign article_json3 = article_json2 | remove_first: r %}
+    {% assign article_json4 = article_json3 | split: "" | reverse | join: ""%}
+    {% capture other_data %}
+    "template": {{ template.name | json }},
+    "url": {{ canonical_url | json }},
+    "comments": {{ article.comments | json }},
+    "comments_count": {{article.comments_count | json }},
+    "comments_enabled": {{article.comments_enabled | json }},
+    "comment_post_url": {{article.comment_post_url | json }},
+    "excerpt": {{article.excerpt | json }},
+    "image": {{article.image | json }},
+    "image_alt": {{article.image.alt | json }},
+    "moderated": {{article.moderated | json }},
+    "user": {{article.user | json }}
+    {% endcapture %}
+    {% assign article_json5 = article_json4 | append: "," | append: other_data | append: r %}
+    current_page_info: {{ article_json5 }}
+    {% when 'blog' %}
+    {% capture blog_json %}{{l}}
+    "template": {{ template.name | json }},
+    "url": {{ canonical_url | json }},
+    "all_tags": {{ blog.all_tags | json }},
+    "articles": {{ blog.articles | json }},
+    "articles_count": {{ blog.articles_count| json }},
+    "comments_enabled": {{ blog.comments_enabled?| json }},
+    "handle": {{ blog.handle| json }},
+    "id": {{ blog.id| json }},
+    "moderated": {{ blog.moderated?| json }},
+    "tags": {{ blog.tags | json }},
+    "current_tags": "", // to do: finish current_tags
+    "title": {{ blog.title| json }},
+    {{r}}{% endcapture%}
+    current_page_info: {{ blog_json }}
+    {% when 'page' %}
+    {% capture page_json %}{{l}}
+    "template": {{ template.name | json }},
+    "url": {{ canonical_url | json }},
+    "author": {{ page.author | json }},
+    "content": {{ page.content | json }},
+    "handle": {{ page.handle | json }},
+    "id": {{ page.id | json }},
+    "handle": {{ page.handle | json }},
+    "published_at": {{ page.published_at | json }},
+    "template_suffix": {{ page.template_suffix | json }},
+    "title": {{ page.title | json }},
+    "url":{{ page.url | json }}
+    {{r}}{% endcapture %}
+    current_page_info: {{ page_json }}
+    {% when 'list-collections' %}
+    current_page_info: {
+      template: {{ template.name | json }},
+      url: {{ canonical_url | json }},
+      collections: [
+        {{l}}
+        "title": {{ collections.all.title | json }},
+        "url": {{ collections.all.url | json }},
+        "handle": {{ collections.all.handle | json }},
+        "id": {{ collections.all.id | json }},
+        "description": {{ collections.all.description | json }},
+        "image": {{ collections.all.image | json }},
+        "published_at": {{ collections.all.published_at | json }},
+        "template_suffix": {{ collections.all.template_suffix | json }}
+        {{r}},
+        {% for type in collections.all.all_types %}
+        {% if type != empty %}
+        {{l}}
+        "title": {{ type | json }},
+        "url": {{ '/collections/types?q=' | append: type | json }},
+        "handle": "type",
+        "id": null,
+        "description": "",
+        "image": null,
+        "published_at": {{ collections.all.published_at | json }},
+        "template_suffix": {{ collections.all.template_suffix | json }}
+        {{r}},
+        {% endif %}
+        {% endfor %}
+        {% for vendor in collections.all.all_vendors %}
+        {{l}}
+        "title": {{ vendor | json }},
+        "url": {{ '/collections/vendors?q=' | append: vendor | json }},
+        "handle": "vendor",
+        "id": null,
+        "description": "",
+        "image": null,
+        "published_at": {{ collections.all.published_at | json }},
+        "template_suffix": {{ collections.all.template_suffix | json }}
+        {{r}},
+        {% endfor %}
+        {% for collection in collections %}
+        {{l}}
+        "title": {{ collection.title | json }},
+        "url": {{ collection.url | json }},
+        "handle": {{ collection.handle | json }},
+        "id": {{ collection.id | json }},
+        "description": {{ collection.description | json }},
+        "image": {{ collection.image | json }}
+        {{r}}
+        {% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    }
+    {% endcase %}
+    {% endcomment %}
   }
 </script>

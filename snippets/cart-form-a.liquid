@@ -1,4 +1,5 @@
-${cart_updating?html`loading......`:html`${cartObj.item_count > 0?html`
+${cartObj.item_count && cartObj.item_count > 0 ?
+html`
 <h1>{{ 'cart.general.title' | t }}</h1>
 <form action="/cart" method="post" novalidate>
   <table class="responsive-table">
@@ -35,7 +36,7 @@ ${cart_updating?html`loading......`:html`${cartObj.item_count > 0?html`
           {% endfor %}
           {% endif %}
           {% endcomment %}
-          <a href="/cart/change?line=${index+1}&amp;quantity=0" @click=${removeItemByLine}>
+          <a href="/cart/change?line=${index+1}&amp;quantity=0" data-line=${index+1} @click=${onRemoveLinkClicked} }>
             <small>{{ 'cart.general.remove' | t }}</small>
           </a>
         </td>
@@ -48,11 +49,14 @@ ${cart_updating?html`loading......`:html`${cartObj.item_count > 0?html`
         </td>
         <td data-label="{{ 'cart.label.quantity' | t }}">
           <input type="number"
+                 data-key="${item.key}"
                  name="updates[]"
                  id="updates_${item.key}"
-                 value="${item.quantity}"
+                 value=${item.quantity}
                  min="0"
-                 aria-label="{{ 'cart.general.item_quantity' | t }}">
+                 aria-label="{{ 'cart.general.item_quantity' | t }}"
+                 ?disabled=${cart_is_updating}
+                 @change=${onQuantityInputChanged} />
         </td>
         <td data-label="{{ 'cart.label.total' | t }}">
           ${item.line_price}
@@ -68,8 +72,8 @@ ${cart_updating?html`loading......`:html`${cartObj.item_count > 0?html`
   <p>${cartObj.total_price}</p>
   ${cartObj.total_discounts > 0?html`<p>{{ 'cart.general.savings' | t }} ${cartObj.total_discounts}</p>`:html``}
   {% comment %}<p>{{ 'cart.general.shipping_at_checkout' | t }}</p>{% endcomment %}
-  <input @click=${updateCartFromForm} type="submit" name="update" value="{{ 'cart.general.update' | t }}">
-  <input type="submit" name="checkout" class="button" value="{{ 'cart.general.checkout' | t }}">
+  <input ?disabled=${cart_is_updating} @click=${onUpdateButtonClicked} type="submit" name="update" value="{{ 'cart.general.update' | t }}">
+  <input ?disabled=${cart_is_updating} type="submit" name="checkout" class="button" value="{{ 'cart.general.checkout' | t }}">
 </form>
 `:html`
 <h1>{{ 'cart.general.title' | t }}</h1>
@@ -79,5 +83,5 @@ ${cart_updating?html`loading......`:html`${cartObj.item_count > 0?html`
 </div>
 <div class="supports-no-cookies">
   <p>{{ 'cart.general.cookies_required' | t }}</p>
-</div>`
-}`}
+</div>
+`}

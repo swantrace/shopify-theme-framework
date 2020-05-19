@@ -64,18 +64,22 @@ export default async () => {
         responseInterceptor,
         responseInterceptorError
       );
+      let realURL = url;
       if (typeof blog_handle === "string") {
-        url = url.replace("[blog_handle]", blog_handle);
+        realURL = url.replace("[blog_handle]", blog_handle);
       }
       if (typeof handle === "string") {
-        url = url.replace("[handle]", handle);
+        realURL = realURL.replace("[handle]", handle);
       }
       if (typeof tags === "string") {
-        url = url.replace("[tags]", tags);
+        realURL = realURL.replace("[tags]", tags);
+      } else {
+        realURL = realURL.replace("/tagged/[tags]", "");
+        realURL = realURL.replace("/[tags]", "");
       }
       if (typeof view === "string") {
         params = { ...params, view };
-        url = url.replace(".js", "");
+        realURL = realURL.replace(".js", "");
         if (typeof themeId === "string") {
           params = { ...params, preview_theme_id: themeId };
         }
@@ -94,7 +98,7 @@ export default async () => {
         ...transforms,
       ];
       return currentInstance({
-        url,
+        url: realURL,
         method,
         params,
         data,
@@ -166,12 +170,12 @@ export default async () => {
 
   const getCollection = ajaxFunctionPromiseCreator({
     method: "get",
-    url: "/collections/[handle]",
+    url: "/collections/[handle]/[tags]",
   });
 
   const getBlog = ajaxFunctionPromiseCreator({
     method: "get",
-    url: "/blogs/[handle]",
+    url: "/blogs/[handle]/tagged/[tags]",
   });
 
   const getArticle = ajaxFunctionPromiseCreator({

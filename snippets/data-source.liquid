@@ -46,16 +46,16 @@
 "body_html": {{ collection.body_html | json }},
 "handle": {{ collection.handle | json }},
 "id": {{ collection.id | json }},
-"published_at": "{{ collection.published_at | date: '%FT%T%:z' }}",
+"published_at": {{ collection.published_at | json }},
 "published_scope": {{ collection.published_scope | json }},
 "sort_order": {{ collection.sort_order | json }},
 "template_suffix": {{ collection.template_suffix | json }},
-"updated_at": "{{ collection.published_at | date: '%FT%T%:z' }}"
+"updated_at": {{ collection.published_at | json }}
 {% endcapture %}
 {% endif %}
 {% capture other_data %}
 "all_products_count": {{ collection.all_products_count | json }},
-"all_tags": [{% for tag in collection.all_tags %}{{l}}"text":{{ tag | json }}, "handle": {{ tag | handleize | json }}{{r}}{% unless forloop.last %}, {% endunless %}{% endfor %}],
+"all_tags": {{ collection.all_tags | json }},
 "all_types": {{ collection.all_types | json }},
 "all_vendors": {{ collection.all_vendors | json }},
 "current_type": {{ collection.current_type | json }},
@@ -63,12 +63,12 @@
 "default_sort_by": {{ collection.default_sort_by | json }},
 "description":{{ collection.description | json }},
 "image":{{ collection.image | json }},
-"next_product":{{ collection.next_product | json }},
-"previous_product": {{ collection.previous_product | json }},
 "products": [{% paginate collection.products by 20 %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
 "products_count": {{ collection.products_count | json }},
 "tags": {{ collection.tags | json }},
-"url": {{ collection.url | json }}
+"page": {{ current_page | default: 1 }},
+"current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
+"sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
 {% endcapture%}
 {% assign collection_json5 = collection_json4 | strip | append: "," | append: other_data | append: r %}
 {{ collection_json5 }}
@@ -101,7 +101,6 @@
 "selected_variant_id": {{product.selected_variant.id | json }},
 "selected_or_first_available_variant_id": {{ product.selected_or_first_available_variant.id | json}},
 "options_with_values": {{ product.options_with_values | json }},
-"selected_variant_id": {{ product.selected_variant.id | json }},
 "template_suffix": {{ product.template_suffix | json }},
 "url": {{ product.url | json }},
 "variants": [
@@ -227,4 +226,62 @@
 {{r}}{% endcapture %}
 {{ shop }}
 {% else %}
+{% when 'list-collections' %}
+[
+	{{l}}
+		"title": {{ collections.all.title | json }},
+		"url": {{ collections.all.url | json }},
+		"handle": {{ collections.all.handle | json }},
+		"id": {{ collections.all.id | json }},
+		"all_tags": {{ collections.all.all_tags | json }},
+		"all_types": {{ collections.all.all_types | json }},
+		"all_vendors": {{ collections.all.all_vendors | json }},
+		"description": {{ collections.all.description | json }},
+		"image": {{ collections.all.image | json }},
+		"published_at": "{{ collections.all.published_at }}",
+		"template_suffix": {{ collections.all.template_suffix | json }}
+	{{r}},
+	{% for type in collections.all.all_types %}
+	{% if type != empty %}
+	{{l}}
+		"title": {{ type | json }},
+		"url": {{ '/collections/types?q=' | append: type | json }},
+		"handle": "type",
+		"id": null,
+		"all_tags": [],
+		"all_types":[],
+		"all_vendors": [],
+		"description": "",
+		"image": null
+	{{r}},
+	{% endif %}
+	{% endfor %}
+	{% for vendor in collections.all.all_vendors %}
+	{{l}}
+		"title": {{ vendor | json }},
+		"url": {{ '/collections/vendors?q=' | append: vendor | json }},
+		"handle": "vendor",
+		"id": null,
+		"all_tags": [],
+		"all_types":[],
+		"all_vendors": [],
+		"description": "",
+		"image": null
+	{{r}},
+	{% endfor %}
+	{% for collection in collections %}
+	{{l}}
+		"title": {{ collection.title | json }},
+		"url": {{ collection.url | json }},
+		"handle": {{ collection.handle | json }},
+		"id": {{ collection.id | json }},
+		"all_tags": {{ collection.all_tags | json }},
+		"all_types": {{ collection.all_types | json }},
+		"all_vendors": {{ collection.all_vendors | json }},
+		"description": {{ collection.description | json }},
+		"image": {{ collection.image | json }}
+	{{r}}
+	{% unless forloop.last %},{% endunless %}
+	{% endfor %}
+]
 {% endcase %}

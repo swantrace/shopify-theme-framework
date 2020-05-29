@@ -7,8 +7,19 @@ const dispatchAjaxFailEvent = (source, error) => {
     detail: { data: error.response.data, source },
   });
   document.dispatchEvent(event);
-  debugger;
 };
+
+const cartTransformFn =
+  window.themeName &&
+  window[window.themeName] &&
+  window[window.themeName].cartTransformFn &&
+  typeof window[window.themeName].cartTransformFn === "function"
+    ? window[window.themeName].cartTransformFn
+    : function (cart) {
+        return new Promise(function (resolve, reject) {
+          resolve(cart);
+        });
+      };
 
 export default async () => {
   const apis = await ajaxAPIsCreator();
@@ -52,6 +63,9 @@ export default async () => {
           return apis.getCart();
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -66,6 +80,9 @@ export default async () => {
         .addItem({ data: new FormData(payload) })
         .then(function (items) {
           return apis.getCart();
+        })
+        .then((cart) => {
+          return cartTransformFn(cart);
         })
         .then((cart) => {
           context.commit("setCart", cart);
@@ -90,6 +107,9 @@ export default async () => {
           return apis.getCart();
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -105,6 +125,9 @@ export default async () => {
           data: { line: payload.line, quantity: payload.quantity },
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -118,6 +141,9 @@ export default async () => {
       apis
         .changeItem({
           data: { id: payload.key, quantity: payload.quantity },
+        })
+        .then((cart) => {
+          return cartTransformFn(cart);
         })
         .then((cart) => {
           context.commit("setCart", cart);
@@ -151,6 +177,9 @@ export default async () => {
           data: { line: payload, quantity: 0 },
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -164,6 +193,9 @@ export default async () => {
       apis
         .changeItem({
           data: { id: payload, quantity: 0 },
+        })
+        .then((cart) => {
+          return cartTransformFn(cart);
         })
         .then((cart) => {
           context.commit("setCart", cart);
@@ -181,6 +213,9 @@ export default async () => {
           data: new FormData(payload),
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -194,6 +229,9 @@ export default async () => {
       apis
         .updateCart({
           data: { attributes: payload },
+        })
+        .then((cart) => {
+          return cartTransformFn(cart);
         })
         .then((cart) => {
           context.commit("setCart", cart);
@@ -211,6 +249,9 @@ export default async () => {
           data: { note: payload },
         })
         .then((cart) => {
+          return cartTransformFn(cart);
+        })
+        .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
         })
@@ -223,6 +264,9 @@ export default async () => {
       context.commit("setCartIsUpdating", true);
       apis
         .clearCart()
+        .then((cart) => {
+          return cartTransformFn(cart);
+        })
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);

@@ -42,7 +42,12 @@
     "url": {{ shop.url | json }},
     "vendors": {{ shop.vendors | json }},
     {{r}}{% endcapture %}
-    shop: {{ shop_json }}
+    shop: {{ shop_json }},
+    cartTransformFn: function(cart){
+      return new Promise(function (resolve, reject) {
+        resolve(cart);
+      });
+    }
     {% comment %}
     {% case template.name %}
     {% when 'collection' %}

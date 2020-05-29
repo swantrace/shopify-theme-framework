@@ -9,6 +9,13 @@ const dispatchAjaxFailEvent = (source, error) => {
   document.dispatchEvent(event);
 };
 
+const dispatchAjaxDoneEvent = (source, data) => {
+  const event = new CustomEvent("ajaxRequestDone", {
+    detail: { data, source },
+  });
+  document.dispatchEvent(event);
+};
+
 const cartTransformFn =
   window.themeName &&
   window[window.themeName] &&
@@ -68,10 +75,11 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxDoneEvent("addItems", cart);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("addItems", error);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent("addItems", error);
         });
     },
     addItemFromForm(context, payload) {
@@ -87,10 +95,11 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxDoneEvent("addItemFromForm", cart);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("addItemFromForm", error);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent("addItemFromForm", error);
         });
     },
     addItem(context, payload) {
@@ -112,10 +121,11 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxDoneEvent("addItem", cart);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("addItem", error);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent("addItem", error);
         });
     },
     changeItemByLine(context, payload) {
@@ -130,10 +140,27 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxDoneEvent("changeItemByLine", cart);
+          if (cart.items.find((item, index) => index == payload.line - 1)) {
+            const modifiedItem = cart.items.find(
+              (item, index) => index == payload.line - 1
+            );
+            if (modifiedItem.quantity != payload.quantity) {
+              throw {
+                response: {
+                  data: {
+                    description: `All ${modifiedItem.quantity} ${modifiedItem.title} are in your cart.`,
+                    message: "Cart Error",
+                    status: 200,
+                  },
+                },
+              };
+            }
+          }
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("changeItemByLine", error);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent("changeItemByLine", error);
         });
     },
     changeItemByKey(context, payload) {
@@ -148,6 +175,7 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxDoneEvent("changeItemByKey", cart);
           if (cart.items.find((item) => item.key == payload.key)) {
             const modifiedItem = cart.items.find(
               (item) => item.key == payload.key
@@ -166,8 +194,8 @@ export default async () => {
           }
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("changeItemByKey", error);
           context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent("changeItemByKey", error);
         });
     },
     removeItemByLine(context, payload) {

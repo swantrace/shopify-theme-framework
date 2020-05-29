@@ -1,4 +1,4 @@
-${cartObj.item_count && cartObj.item_count > 0 ?
+${cart.item_count && cart.item_count > 0 ?
 html`
 <h1>{{ 'cart.general.title' | t }}</h1>
 <form action="/cart" method="post" novalidate>
@@ -12,7 +12,7 @@ html`
       </tr>
     </thead>
     <tbody>
-      ${cartObj.items.map((item, index) => html`
+      ${cart.items.map((item, index) => html`
       <tr class="responsive-table-row">
         <td data-label="{{ 'customer.order.product' | t }}">
           ${item.image?html`<a href="${item.url}"><img src=${item.image} style="width: 250px;"/></a>`:html``}
@@ -66,11 +66,11 @@ html`
   </table>
   {% if settings.cart_notes_enable %}
   <label for="CartSpecialInstructions">{{ 'cart.general.note' | t }}</label>
-  <textarea name="note" id="CartSpecialInstructions">{{ cartObj.note }}</textarea>
+  <textarea name="note" id="CartSpecialInstructions">{{ cart.note }}</textarea>
   {% endif %}
   <p>{{ 'cart.general.subtotal' | t }}</p>
-  <p>${cartObj.total_price}</p>
-  ${cartObj.total_discounts > 0?html`<p>{{ 'cart.general.savings' | t }} ${cartObj.total_discounts}</p>`:html``}
+  <p>${cart.total_price}</p>
+  ${cart.total_discounts > 0?html`<p>{{ 'cart.general.savings' | t }} ${cart.total_discounts}</p>`:html``}
   {% comment %}<p>{{ 'cart.general.shipping_at_checkout' | t }}</p>{% endcomment %}
   <input ?disabled=${cart_is_updating} @click=${onUpdateButtonClicked} type="submit" name="update" value="{{ 'cart.general.update' | t }}">
   <input ?disabled=${cart_is_updating} type="submit" name="checkout" class="button" value="{{ 'cart.general.checkout' | t }}">

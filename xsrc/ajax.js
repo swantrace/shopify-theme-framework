@@ -45,9 +45,6 @@ export default async () => {
       requestInterceptorError = (error) => Promise.reject(error),
       responseInterceptor = (response) => response,
       responseInterceptorError = (error) => Promise.reject(error),
-      errorHandler = (error) => {
-        console.log(error);
-      },
       ...otherParams
     } = {}) => {
       let currentInstance;
@@ -55,6 +52,14 @@ export default async () => {
         currentInstance = axios.create({ ...config, baseURL });
       } else {
         currentInstance = instance;
+      }
+      if (
+        ["/cart/add.js", "/cart/change.js", "/cart/update.js"].includes(url)
+      ) {
+        currentInstance.defaults.headers.post["X-Requested-With"] =
+          "XMLHttpRequest";
+      } else {
+        delete currentInstance.defaults.headers.post["X-Requested-With"];
       }
       instance.interceptors.request.use(
         requestInterceptor,
@@ -107,9 +112,7 @@ export default async () => {
         onUploadProgress,
         onDownloadProgress,
         ...otherParams,
-      })
-        .then((response) => response.data)
-        .catch(errorHandler);
+      }).then((response) => response.data);
     };
     return fn;
   };

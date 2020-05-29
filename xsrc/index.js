@@ -1,12 +1,13 @@
 import globalStoreCreator from "./globalStore";
-import { component, html, useState, useEffect } from "haunted";
+import { html, component } from "haunted";
+import hooksCreator from "./hooks";
 
-const haunted = { html, useEffect, useState };
 const init = async function () {
   const { store, apis } = await globalStoreCreator();
+  const hooks = await hooksCreator(store, apis);
   window[window.themeName].themeElements.forEach(
     ({ tagName, observedAttributes, definition }) => {
-      const Component = definition(haunted, store, apis);
+      const Component = definition(html, hooks, store, apis);
       Component.observedAttributes = observedAttributes;
       customElements.define(
         tagName,

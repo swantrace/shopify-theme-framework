@@ -2,6 +2,14 @@ import ajaxAPIsCreator from "./ajax";
 import { encodedStr } from "./helpers";
 import Store from "./Store";
 
+const dispatchAjaxFailEvent = (source, error) => {
+  const event = new CustomEvent("ajaxRequestFail", {
+    detail: { data: error.response.data, source },
+  });
+  document.dispatchEvent(event);
+  debugger;
+};
+
 export default async () => {
   const apis = await ajaxAPIsCreator();
   const template = window[window.themeName].template;
@@ -46,6 +54,10 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("addItems", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     addItemFromForm(context, payload) {
@@ -57,6 +69,10 @@ export default async () => {
         })
         .then((cart) => {
           context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("addItemFromForm", error);
           context.commit("setCartIsUpdating", false);
         });
     },
@@ -76,6 +92,10 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("addItem", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     changeItemByLine(context, payload) {
@@ -86,6 +106,10 @@ export default async () => {
         })
         .then((cart) => {
           context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("changeItemByLine", error);
           context.commit("setCartIsUpdating", false);
         });
     },
@@ -98,6 +122,26 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+          if (cart.items.find((item) => item.key == payload.key)) {
+            const modifiedItem = cart.items.find(
+              (item) => item.key == payload.key
+            );
+            if (modifiedItem.quantity != payload.quantity) {
+              throw {
+                response: {
+                  data: {
+                    description: `All ${modifiedItem.quantity} ${modifiedItem.title} are in your cart.`,
+                    message: "Cart Error",
+                    status: 200,
+                  },
+                },
+              };
+            }
+          }
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("changeItemByKey", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     removeItemByLine(context, payload) {
@@ -108,6 +152,10 @@ export default async () => {
         })
         .then((cart) => {
           context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("removeItemByLine", error);
           context.commit("setCartIsUpdating", false);
         });
     },
@@ -120,6 +168,10 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("removeItemByKey", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     updateCartFromForm(context, payload) {
@@ -130,6 +182,10 @@ export default async () => {
         })
         .then((cart) => {
           context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("updateCartFromForm", error);
           context.commit("setCartIsUpdating", false);
         });
     },
@@ -142,6 +198,10 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("updateCartAttributes", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     updateCartNote(context, payload) {
@@ -153,14 +213,24 @@ export default async () => {
         .then((cart) => {
           context.commit("setCart", cart);
           context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("updateCartNote", error);
+          context.commit("setCartIsUpdating", false);
         });
     },
     clearCart(context, payload) {
       context.commit("setCartIsUpdating", true);
-      apis.clearCart().then((cart) => {
-        context.commit("setCart", cart);
-        context.commit("setCartIsUpdating", false);
-      });
+      apis
+        .clearCart()
+        .then((cart) => {
+          context.commit("setCart", cart);
+          context.commit("setCartIsUpdating", false);
+        })
+        .catch((error) => {
+          dispatchAjaxFailEvent("clearCart", error);
+          context.commit("setCartIsUpdating", false);
+        });
     },
     changeCollectionTags(context, payload) {
       if (context.state.collection) {
@@ -315,6 +385,10 @@ export default async () => {
   };
 
   const mutations = {
+    setError(state, payload) {
+      state.error = payload;
+      return state;
+    },
     setCart(state, payload) {
       state.cart = payload;
       return state;

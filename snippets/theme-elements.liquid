@@ -1,91 +1,39 @@
 <script>
 window[window.themeName].themeElements = [
   {
-    tagName: 'cart-form-a',
+    tagName: "cart-form-a",
     observedAttributes:  ["cart_json", "cart_is_updating", "old_cart_json"],
-    definition: function(haunted, store, apis) {
-      const useEffect = haunted.useEffect;
-      const html = haunted.html;
-      const useState = haunted.useState;
+    definition: function(html, hooks, store, apis) {
       return function({cart_json, cart_is_updating, old_cart_json}){
-        const cartObj = JSON.parse(cart_json);
-        
-        useEffect(function(){
-          if(cart_is_updating === null && cart_json === old_cart_json) {
-            document
-              .querySelectorAll('input[name="updates[]"]')
-              .forEach((el) => {
-                el.value = el.getAttribute("value");
-              });
-          }
-        },[cart_json, cart_is_updating, old_cart_json])
-
-        const onUpdateButtonClicked = (e) => {
-          e.preventDefault();
-          store.dispatch("updateCartFromForm", e.target.closest("form[action='/cart']"))
-        }
-
-        const onRemoveLinkClicked = (e) => {
-          e.preventDefault();
-          store.dispatch("removeItemByLine", e.target.closest("[data-line]").dataset.line)
-        }
-
-        const onQuantityInputChanged = (e) => {
-          e.preventDefault(); 
-          store.dispatch("changeItemByKey", {key: e.target.dataset.key, quantity: e.target.value})
-        }
-
+        var cartFormRelatedData = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
+        var cart = cartFormRelatedData[0];
+        var old_cart = cartFormRelatedData[1];
+        var onQuantityInputChanged = cartFormRelatedData[2]['onQuantityInputChanged'];
+        var onRemoveLinkClicked = cartFormRelatedData[2]['onRemoveLinkClicked'];
+        var onUpdateButtonClicked = cartFormRelatedData[2]['onUpdateButtonClicked'];
         return html`{% render 'cart-form-a' %}`
       }
     }
   },
   {
-    tagName: 'add-to-cart-form',
+    tagName: "add-to-cart-form",
     observedAttributes: ['product_handle', 'cart_is_updating'],
-    definition: function(haunted, store, apis){ 
-      const useEffect = haunted.useEffect;
-      const html = haunted.html;
-      const useState = haunted.useState;
+    definition: function(html, hooks, store, apis){ 
       return function({product_handle, cart_is_updating}) {
-        const [product, setProduct] = useState(null);
-        const [currentVariant, setCurrentVariant] = useState(null);
-        const [options, setOptions] = useState(null);
-        useEffect(() => {
-          apis.getProduct({view: 'theme', handle: product_handle})
-          .then(rawProduct => {
-            console.log(rawProduct);
-            const currentVariantId = rawProduct.selected_variant_id?rawProduct.selected_variant_id:rawProduct.first_available_variant_id?rawProduct.first_available_variant_id:null;
-            const currentVariant = !currentVariantId?null:rawProduct.variants.find(variant => variant.id === currentVariantId);
-            const options = rawProduct.options_with_values;
-            delete rawProduct['selected_variant_id'];
-            delete rawProduct['first_available_variant_id']
-            setProduct(rawProduct);
-            setCurrentVariant(currentVariant);
-            setOptions(options);
-          });
-        }, ["product_handle"]);
-        
-        const onATCButtonClicked = (e) => {
-          e.preventDefault();
-          store.dispatch("addItemFromForm", e.target.closest("form[action='/cart/add']"));
-        }
-        
-        const changeVariantAccordingToOptions = (e) => {
-          const option1 = this.querySelector('select[data-option="option1"]') && this.querySelector('select[data-option="option1"]').value;
-          const option2 = this.querySelector('select[data-option="option2"]') && this.querySelector('select[data-option="option2"]').value;
-          const option3 = this.querySelector('select[data-option="option3"]') && this.querySelector('select[data-option="option3"]').value;
-          const currentVariant = product.variants.find(variant => variant.option1 === option1 && variant.option2 === option2 && variant.option3 === option3);
-          setCurrentVariant(currentVariant);
-        }
-
-        return html`{% render 'add-to-cart-form' %}`;
+        var atcFormRelatedData = hooks.useATCForm(product_handle);
+        var product = atcFormRelatedData[0];
+        var currentVariant = atcFormRelatedData[1];
+        var options = atcFormRelatedData[2];
+        var onATCButtonClicked = atcFormRelatedData[3].onATCButtonClicked
+        var onOptionChanged = atcFormRelatedData[3].onOptionChanged
+        return html`{% render "add-to-cart-form" %}`;
       }
     }  
   },
   {
     tagName: 'collection-products-list',
     observedAttributes: ['product_handles'],
-    definition: function(haunted, store, apis){ 
+    definition: function(html, hooks, store, apis){ 
       return function(){
         return html``;
       }

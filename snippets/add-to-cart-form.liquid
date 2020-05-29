@@ -10,7 +10,7 @@
     ${product && !product.has_only_default_variant?html`${options.map((option, index) => html`
       <div class="selector-wrapper">
         <label for="productSelect-option-${index}">${option.name}</label>
-        <select @change=${changeVariantAccordingToOptions} class="single-option-selector" data-option="option${option.position}" id="ProductSelect-product-template-option-${index}">
+        <select @change=${onOptionChanged} class="single-option-selector" data-option-position="option${option.position}" id="ProductSelect-product-template-option-${index}">
           ${option.values.map(value => html`<option value="${value}">${value}</option>`)}
         </select>
       </div>`)}`:html``}

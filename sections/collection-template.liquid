@@ -10,10 +10,10 @@
     {% if section.settings.tags_enable or section.settings.sort_enable %}
     <div class="section-header__link--right">
       {% if section.settings.tags_enable %}
-        {% include 'collection-tags' %}
+        <collection-tags collection-tags-filter></collection-tags>
       {% endif %}
       {% if section.settings.sort_enable %}
-        {% include 'collection-sorting' %}
+        <collection-sorting collection-sort-by-controller></collection-sorting>
       {% endif %}
     </div>
     {% endif %}

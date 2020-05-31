@@ -1,8 +1,8 @@
 <div class="form-horizontal">
   <label for="SortBy">{{ 'collections.sorting.title' | t }}</label>
-  <select name="sort_by" id="SortBy" class="btn--tertiary" aria-describedby="a11y-refresh-page-message">
-  {% for option in collection.sort_options %}
-     <option value="{{ option.value }}"{% if sort_by == option.value %} selected="selected"{% endif %}>{{ option.name }}</option>
-  {% endfor %}
+  <select name="sort_by" id="SortBy"  @change=${onSortByChanged} class="btn--tertiary" aria-describedby="a11y-refresh-page-message">
+  ${sort_options && sort_options.length && sort_options.map(option => {
+    return html`<option value=${option.value} ?selected=${sort_by === option.value }>${option.name}</option>`
+  })}
   </select>
 </div>

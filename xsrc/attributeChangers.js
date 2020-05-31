@@ -54,6 +54,10 @@ const setCollectionPageControllerAttribute = (newValue) => {
 const setCollectionSortByControllerAttribute = (newValue) => {
   document.querySelectorAll(`[collection-sort-by-controller]`).forEach((el) => {
     el.setAttribute("sort_by", newValue.sort_by);
+    el.setAttribute(
+      "sort_options",
+      encodedStr(JSON.stringify(newValue.sort_options))
+    );
   });
 };
 

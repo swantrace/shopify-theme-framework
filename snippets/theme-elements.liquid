@@ -1,39 +1,49 @@
 <script>
 window[window.themeName].themeElements = [
   {
-    tagName: "cart-form-a",
+    tagName: "main-cart-form",
     observedAttributes:  ["cart_json", "cart_is_updating", "old_cart_json"],
-    definition: function(html, hooks, store, apis) {
+    definition: function(html, hooks) {
       return function({cart_json, cart_is_updating, old_cart_json}){
-        var cartFormRelatedData = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
-        var cart = cartFormRelatedData[0];
-        var old_cart = cartFormRelatedData[1];
-        var onQuantityInputChanged = cartFormRelatedData[2]['onQuantityInputChanged'];
-        var onRemoveLinkClicked = cartFormRelatedData[2]['onRemoveLinkClicked'];
-        var onUpdateButtonClicked = cartFormRelatedData[2]['onUpdateButtonClicked'];
-        return html`{% render 'cart-form-a' %}`
+        var [cart, old_cart, { onQuantityInputChanged, onRemoveLinkClicked, onUpdateButtonClicked }] = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
+        return html`{% render 'main-cart-form' %}`
       }
     }
   },
   {
     tagName: "add-to-cart-form",
     observedAttributes: ['product_handle', 'cart_is_updating'],
-    definition: function(html, hooks, store, apis){ 
+    definition: function(html, hooks){ 
       return function({product_handle, cart_is_updating}) {
-        var atcFormRelatedData = hooks.useATCForm(product_handle);
-        var product = atcFormRelatedData[0];
-        var currentVariant = atcFormRelatedData[1];
-        var options = atcFormRelatedData[2];
-        var onATCButtonClicked = atcFormRelatedData[3].onATCButtonClicked
-        var onOptionChanged = atcFormRelatedData[3].onOptionChanged
+        var [product, currentVariant, options, { onATCButtonClicked, onOptionChanged }] = hooks.useATCForm(product_handle);
         return html`{% render "add-to-cart-form" %}`;
       }
     }  
   },
   {
+    tagName: 'collection-tags',
+    observedAttributes: ['current_tags', 'all_tags', 'tags'],
+    definition: function(html, hooks, store, apis){ 
+      return function({current_tags, all_tags, tags}){
+        var [current_tags, all_tags, tags, { onCurrentTagsChanged }] = hooks.useCollectionTagsFilter(current_tags, all_tags, tags);
+        return html`{% render "collection-tags" %}`;
+      }
+    }
+  },
+  {
+    tagName: 'collection-sorting',
+    observedAttributes: ['sort_by', 'sort_options'],
+    definition: function(html, hooks, store, apis){
+      return function({sort_by, sort_options}){
+        var [sort_options, { onSortByChanged }] = hooks.useCollectionSortByController(sort_options);
+        return html`{% render "collection-sorting" %}`
+      }
+    }
+  },
+  {
     tagName: 'collection-products-list',
     observedAttributes: ['product_handles'],
-    definition: function(html, hooks, store, apis){ 
+    definition: function(html, hooks){ 
       return function(){
         return html``;
       }

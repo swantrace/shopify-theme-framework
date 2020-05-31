@@ -109,5 +109,29 @@ export default async function (store, apis) {
       },
     ];
   }
-  return { useState, useEffect, useCartForm, useATCForm };
+  function useCollectionTagsFilter(current_tags, all_tags, tags) {
+    current_tags =
+      !current_tags || current_tags === true ? [] : current_tags.split("+");
+    all_tags = !all_tags || all_tags === true ? [] : all_tags.split(",");
+    tags = !tags || tags === true ? [] : tags.split(",");
+    const onCurrentTagsChanged = function (e) {
+      store.dispatch("changeCollectionCurrentTags", e.target.value);
+    };
+    return [current_tags, all_tags, tags, { onCurrentTagsChanged }];
+  }
+  function useCollectionSortByController(sort_options) {
+    sort_options = JSON.parse(sort_options ? sort_options : null);
+    const onSortByChanged = function (e) {
+      store.dispatch("changeCollectionSortBy", e.target.value);
+    };
+    return [sort_options, { onSortByChanged }];
+  }
+  return {
+    useState,
+    useEffect,
+    useCartForm,
+    useATCForm,
+    useCollectionTagsFilter,
+    useCollectionSortByController,
+  };
 }

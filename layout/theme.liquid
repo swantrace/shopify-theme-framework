@@ -56,7 +56,8 @@
        <div class="grid">
         <div class="grid__item">
           {{ content_for_layout }}
-          <add-to-cart-form atc-form product_handle="14k-wire-bloom-earrings"></add-to-cart-form>
+
+          {% comment %}          <add-to-cart-form atc-form product_handle="14k-wire-bloom-earrings"></add-to-cart-form>
           <hr>
           <add-to-cart-form atc-form product_handle="650c-micro-wheelset"></add-to-cart-form>
           <hr>
@@ -64,7 +65,6 @@
           <hr>
           <cart-form-b cart-form cart_json="{{ cart | json | escape }}"></cart-form-b>
           <hr>
-          {% comment %}
           <theme-collection-template
             collection_handle="all" 
             items_per_page="200" 

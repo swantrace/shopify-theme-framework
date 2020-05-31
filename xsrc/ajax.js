@@ -34,7 +34,7 @@ export default async () => {
       baseURL = null,
       handle = null,
       blog_handle = null,
-      tags = null,
+      current_tags = null,
       view = null,
       params = {},
       data = {},
@@ -76,11 +76,11 @@ export default async () => {
       if (typeof handle === "string") {
         realURL = realURL.replace("[handle]", handle);
       }
-      if (typeof tags === "string") {
-        realURL = realURL.replace("[tags]", tags);
+      if (typeof current_tags === "string") {
+        realURL = realURL.replace("[current_tags]", current_tags);
       } else {
-        realURL = realURL.replace("/tagged/[tags]", "");
-        realURL = realURL.replace("/[tags]", "");
+        realURL = realURL.replace("/tagged/[current_tags]", "");
+        realURL = realURL.replace("/[current_tags]", "");
       }
       if (typeof view === "string") {
         params = { ...params, view };
@@ -173,12 +173,12 @@ export default async () => {
 
   const getCollection = ajaxFunctionPromiseCreator({
     method: "get",
-    url: "/collections/[handle]/[tags]",
+    url: "/collections/[handle]/[current_tags]",
   });
 
   const getBlog = ajaxFunctionPromiseCreator({
     method: "get",
-    url: "/blogs/[handle]/tagged/[tags]",
+    url: "/blogs/[handle]/tagged/[current_tags]",
   });
 
   const getArticle = ajaxFunctionPromiseCreator({

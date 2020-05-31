@@ -69,6 +69,7 @@
 "page": {{ current_page | default: 1 }},
 "current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
 "sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
+"view_type": "grid"
 {% endcapture%}
 {% assign collection_json5 = collection_json4 | strip | append: "," | append: other_data | append: r %}
 {{ collection_json5 }}

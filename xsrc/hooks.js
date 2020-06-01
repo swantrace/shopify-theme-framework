@@ -73,7 +73,72 @@ export default async function (store, apis) {
           setCurrentVariant(tmpCurrentVariant);
           setOptions(tmpOptions);
         });
-    }, ["product_handle"]);
+    }, [product_handle]);
+
+    const onATCButtonClicked = (e) => {
+      e.preventDefault();
+      store.dispatch(
+        "addItemFromForm",
+        e.target.closest("form[action='/cart/add']")
+      );
+    };
+
+    function onOptionChanged(e) {
+      const variantOptionValues = {
+        option1: currentVariant.option1,
+        option2: currentVariant.option2,
+        option3: currentVariant.option3,
+        [e.target.dataset.optionPosition]: e.target.value,
+      };
+      const tmpVariant = product.variants.find(
+        (variant) =>
+          variant.option1 === variantOptionValues.option1 &&
+          variant.option2 === variantOptionValues.option2 &&
+          variant.option3 === variantOptionValues.option3
+      );
+      setCurrentVariant(tmpVariant);
+    }
+
+    return [
+      product,
+      currentVariant,
+      options,
+      {
+        onATCButtonClicked,
+        onOptionChanged,
+      },
+    ];
+  }
+  function useProductGridItem(product_handle) {
+    const [currentVariant, setCurrentVariant] = useState(null);
+    const [product, setProduct] = useState(null);
+    const [options, setOptions] = useState(null);
+    useEffect(() => {
+      apis
+        .getProduct({
+          view: "theme",
+          handle: product_handle,
+        })
+        .then((rawProduct) => {
+          const currentVariantId = rawProduct.selected_variant_id
+            ? rawProduct.selected_variant_id
+            : rawProduct.first_available_variant_id
+            ? rawProduct.first_available_variant_id
+            : null;
+          const tmpCurrentVariant = !currentVariantId
+            ? null
+            : rawProduct.variants.find(
+                (variant) => variant.id === currentVariantId
+              );
+          const tmpOptions = rawProduct.options_with_values;
+          delete rawProduct["selected_variant_id"];
+          delete rawProduct["first_available_variant_id"];
+
+          setProduct(rawProduct);
+          setCurrentVariant(tmpCurrentVariant);
+          setOptions(tmpOptions);
+        });
+    }, [product_handle]);
 
     const onATCButtonClicked = (e) => {
       e.preventDefault();
@@ -133,5 +198,6 @@ export default async function (store, apis) {
     useATCForm,
     useCollectionTagsFilter,
     useCollectionSortByController,
+    useProductGridItem,
   };
 }

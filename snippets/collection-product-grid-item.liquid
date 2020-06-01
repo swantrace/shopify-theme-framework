@@ -1,0 +1,52 @@
+${product?html`
+<div
+  class="grid__item wide--one-fifth large--one-quarter medium-down--one-half"
+>
+  <div class="sold-out on-sale">
+    <a
+      href="${product.url}"
+      class="grid-link{% if section.settings.center_grid_link %} text-center{% endif %}"
+    >
+      <span
+        class="grid-link__image grid-link__image--loading{% if section.settings.show_sold_out_circle %} grid-link__image-sold-out{% endif %} grid-link__image--product"
+        data-image-wrapper
+      >
+        {% if section.settings.show_sale_circle %}
+        <span class="badge badge--sale">
+          <span
+            class="badge__text{% if sale_text.size > 7 %} badge__text--small{% endif %}"
+            >{{ "products.product.sale" | t }}</span
+          >
+        </span>
+        {% endif %} {% if section.settings.show_sold_out_circle %}
+        <span class="badge badge--sold-out">
+          <span
+            class="badge__text{% if sold_out_text.size > 9 %} badge__text--small{% endif %}"
+            >{{ "products.product.sold_out" | t }}</span
+          >
+        </span>
+        {% endif %}
+        <span class="grid-link__image-centered">
+          {% if featured.title != '' %}
+          <img src="${ product.featured_image }" class="product__img" />
+          {% else %} {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{%
+          endcapture %}
+          {{
+            "product-"
+              | append: current
+              | placeholder_svg_tag: "placeholder-svg"
+          }}
+          {% endif %}
+        </span>
+      </span>
+      <p class="grid-link__title">${product.title}</p>
+      {% if section.settings.vendor_enable %}
+      <p class="grid-link__title grid-link__vendor">${product.vendor}</p>
+      {% endif %}
+      <p class="grid-link__meta">
+        ${product.price}
+      </p>
+    </a>
+  </div>
+</div>
+`:html``}

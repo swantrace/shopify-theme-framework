@@ -2,7 +2,7 @@ ${all_tags.length>0?html`
 <div class="form-horizontal">
   <label for="BrowseBy">{{ 'collections.sorting.browse' | t }}</label>
   <select name="BrowseBy" id="BrowseBy" class="btn--tertiary" @change=${onCurrentTagsChanged}>
-    <option>{{ 'collections.sorting.all_tags' | t }}</option>
+    <option value="">{{ 'collections.sorting.all_tags' | t }}</option>
     ${all_tags.map(t => {
       return html`<option value=${window[window.themeName].helpers.handleize(t)} ?selected=${current_tags[0] === window[window.themeName].helpers.handleize(t)}>${t}</option>`
     })}

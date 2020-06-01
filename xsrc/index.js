@@ -20,6 +20,6 @@ const init = async function () {
   store.dispatch("initiate");
 };
 
-window.addEventListener("DOMContentLoaded", (event) => {
+window.addEventListener("load", (event) => {
   init();
 });

@@ -1,5 +1,6 @@
 import ajaxAPIsCreator from "./ajax";
 import Store from "./Store";
+import { adjustCollectionPageURL } from "./helpers";
 import {
   enableCartIsUpdating,
   disableCartIsUpdating,
@@ -305,6 +306,7 @@ export default async () => {
         });
     },
     changeCollectionCurrentTags(context, payload) {
+      console.log(payload);
       if (context.state.collection !== undefined) {
         context.commit("setCollectionCurrentTags", payload);
         context.commit("setCollectionIsUpdating", true);
@@ -326,6 +328,13 @@ export default async () => {
             sort_by: context.state.collection.sort_by,
           };
         }
+
+        adjustCollectionPageURL(
+          params,
+          current_tags,
+          context.state.collection.handle
+        );
+
         apis
           .getCollection({
             handle: context.state.collection.handle,
@@ -333,7 +342,9 @@ export default async () => {
             params,
             current_tags,
           })
-          .then(({ products }) => {
+          .then(({ products, products_count }) => {
+            context.commit("setCollectionProductsCount", products_count);
+            context.commit("setCollectionPage", 1);
             context.commit("setCollectionProducts", products);
             context.commit("setCollectionIsUpdating", false);
           });
@@ -361,6 +372,13 @@ export default async () => {
             sort_by: context.state.collection.sort_by,
           };
         }
+
+        adjustCollectionPageURL(
+          params,
+          current_tags,
+          context.state.collection.handle
+        );
+
         apis
           .getCollection({
             handle: context.state.collection.handle,
@@ -378,6 +396,7 @@ export default async () => {
       if (context.state.collection) {
         context.commit("setCollectionSortBy", payload);
         context.commit("setCollectionIsUpdating", true);
+
         let current_tags, params;
         if (
           context.state.collection.handle === "types" ||
@@ -396,6 +415,13 @@ export default async () => {
             sort_by: payload,
           };
         }
+
+        adjustCollectionPageURL(
+          params,
+          current_tags,
+          context.state.collection.handle
+        );
+
         apis
           .getCollection({
             handle: context.state.collection.handle,
@@ -475,6 +501,9 @@ export default async () => {
       state.collection = payload;
       return state;
     },
+    setCollectionProductsCount(state, payload) {
+      state.collection = { ...state.collection, products_count: payload };
+    },
     setCollectionCurrentTags(state, payload) {
       state.collection = { ...state.collection, current_tags: payload };
       return state;
@@ -546,6 +575,7 @@ export default async () => {
               break;
             case "products":
               setCollectionProductsListAttribute(newValue);
+              setCollectionPageControllerAttribute(newValue);
               break;
             default:
               break;

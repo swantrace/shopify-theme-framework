@@ -30,11 +30,8 @@
     {% assign grid_item_width = 'wide--one-fifth large--one-quarter medium-down--one-half' %}
     {%- assign product_width = 335 -%}
 
-    {% for product in collection.products %}
-      {% assign featured = product %}
-      <div class="grid__item {{grid_item_width}}">
-        {% include 'product-grid-item' %}
-      </div>
+    {% if collection.products.size > 0 %}
+      <collection-products-list collection-products-list></collection-products-list>
     {% else %}
 
       {% if shop.products_count == 0 %}
@@ -66,7 +63,7 @@
         </div>
       {% endif %}
 
-    {% endfor %}
+    {% endif %}
 
   </div>
 

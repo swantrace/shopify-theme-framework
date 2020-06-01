@@ -1,7 +1,7 @@
 <script>
   window[window.themeName].themeElements = [
     {
-      tagName: "main-cart-form",
+      tagName: "cart-form",
       observedAttributes: ["cart_json", "cart_is_updating", "old_cart_json"],
       definition: function (html, hooks) {
         return function ({ cart_json, cart_is_updating, old_cart_json }) {
@@ -14,12 +14,12 @@
               onUpdateButtonClicked,
             },
           ] = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
-          return html`{% render 'main-cart-form' %}`;
+          return html`{% render 'cart-form-main' %}`;
         };
       },
     },
     {
-      tagName: "add-to-cart-form",
+      tagName: "product-atc-form",
       observedAttributes: ["product_handle", "cart_is_updating"],
       definition: function (html, hooks) {
         return function ({ product_handle, cart_is_updating }) {
@@ -29,7 +29,7 @@
             options,
             { onATCButtonClicked, onOptionChanged },
           ] = hooks.useATCForm(product_handle);
-          return html`{% render "add-to-cart-form" %}`;
+          return html`{% render "product-atc-form" %}`;
         };
       },
     },
@@ -98,10 +98,12 @@
     },
     {
       tagName: "collection-products-list",
-      observedAttributes: ["product_handles"],
+      observedAttributes: ["product_handles", "view_type"],
       definition: function (html, hooks) {
-        return function () {
-          return html``;
+        return function ({ product_handles, view_type }) {
+          product_handles = (product_handles || "").split(",");
+          console.log(product_handles);
+          return html`{% render "collection-products-list" %}`;
         };
       },
     },

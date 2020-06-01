@@ -63,7 +63,9 @@ const setCollectionSortByControllerAttribute = (newValue) => {
 
 const setCollectionViewTypeControllerAttribute = (newValue) => {
   document
-    .querySelectorAll(`[collection-view-type-controller]`)
+    .querySelectorAll(
+      `[collection-view-type-controller], [collection-products-list]`
+    )
     .forEach((el) => {
       el.setAttribute("view_type", newValue.view_type);
     });
@@ -71,8 +73,7 @@ const setCollectionViewTypeControllerAttribute = (newValue) => {
 
 const setCollectionProductsListAttribute = (newValue) => {
   document.querySelectorAll(`[collection-products-list]`).forEach((el) => {
-    el.setAttribute("products_handles", newValue.products);
-    el.setAttribute("view_type", newValue.view_type);
+    el.setAttribute("product_handles", newValue.products);
   });
 };
 

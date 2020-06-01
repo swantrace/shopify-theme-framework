@@ -1,53 +1,109 @@
 <script>
-window[window.themeName].themeElements = [
-  {
-    tagName: "main-cart-form",
-    observedAttributes:  ["cart_json", "cart_is_updating", "old_cart_json"],
-    definition: function(html, hooks) {
-      return function({cart_json, cart_is_updating, old_cart_json}){
-        var [cart, old_cart, { onQuantityInputChanged, onRemoveLinkClicked, onUpdateButtonClicked }] = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
-        return html`{% render 'main-cart-form' %}`
-      }
-    }
-  },
-  {
-    tagName: "add-to-cart-form",
-    observedAttributes: ['product_handle', 'cart_is_updating'],
-    definition: function(html, hooks){ 
-      return function({product_handle, cart_is_updating}) {
-        var [product, currentVariant, options, { onATCButtonClicked, onOptionChanged }] = hooks.useATCForm(product_handle);
-        return html`{% render "add-to-cart-form" %}`;
-      }
-    }  
-  },
-  {
-    tagName: 'collection-tags',
-    observedAttributes: ['current_tags', 'all_tags', 'tags'],
-    definition: function(html, hooks, store, apis){ 
-      return function({current_tags, all_tags, tags}){
-        var [current_tags, all_tags, tags, { onCurrentTagsChanged }] = hooks.useCollectionTagsFilter(current_tags, all_tags, tags);
-        return html`{% render "collection-tags" %}`;
-      }
-    }
-  },
-  {
-    tagName: 'collection-sorting',
-    observedAttributes: ['sort_by', 'sort_options'],
-    definition: function(html, hooks, store, apis){
-      return function({sort_by, sort_options}){
-        var [sort_options, { onSortByChanged }] = hooks.useCollectionSortByController(sort_options);
-        return html`{% render "collection-sorting" %}`
-      }
-    }
-  },
-  {
-    tagName: 'collection-products-list',
-    observedAttributes: ['product_handles'],
-    definition: function(html, hooks){ 
-      return function(){
-        return html``;
-      }
-    }
-  }
-]
+  window[window.themeName].themeElements = [
+    {
+      tagName: "main-cart-form",
+      observedAttributes: ["cart_json", "cart_is_updating", "old_cart_json"],
+      definition: function (html, hooks) {
+        return function ({ cart_json, cart_is_updating, old_cart_json }) {
+          var [
+            cart,
+            old_cart,
+            {
+              onQuantityInputChanged,
+              onRemoveLinkClicked,
+              onUpdateButtonClicked,
+            },
+          ] = hooks.useCartForm(cart_json, cart_is_updating, old_cart_json);
+          return html`{% render 'main-cart-form' %}`;
+        };
+      },
+    },
+    {
+      tagName: "add-to-cart-form",
+      observedAttributes: ["product_handle", "cart_is_updating"],
+      definition: function (html, hooks) {
+        return function ({ product_handle, cart_is_updating }) {
+          var [
+            product,
+            currentVariant,
+            options,
+            { onATCButtonClicked, onOptionChanged },
+          ] = hooks.useATCForm(product_handle);
+          return html`{% render "add-to-cart-form" %}`;
+        };
+      },
+    },
+    {
+      tagName: "collection-tags",
+      observedAttributes: ["current_tags", "all_tags", "tags"],
+      definition: function (html, hooks, store, apis) {
+        return function ({ current_tags, all_tags, tags }) {
+          var [
+            current_tags,
+            all_tags,
+            tags,
+            { onCurrentTagsChanged },
+          ] = hooks.useCollectionTagsFilter(current_tags, all_tags, tags);
+          return html`{% render "collection-tags" %}`;
+        };
+      },
+    },
+    {
+      tagName: "collection-sorting",
+      observedAttributes: ["sort_by", "sort_options"],
+      definition: function (html, hooks, store, apis) {
+        return function ({ sort_by, sort_options }) {
+          var [
+            sort_options,
+            { onSortByChanged },
+          ] = hooks.useCollectionSortByController(sort_options);
+          return html`{% render "collection-sorting" %}`;
+        };
+      },
+    },
+    {
+      tagName: "collection-pagination",
+      observedAttributes: ["current_page", "products_count", "items_per_page"],
+      definition: function (html, hooks, store, apis) {
+        return function ({ current_page, products_count, items_per_page }) {
+          current_page = parseInt(current_page || 1);
+          products_count = parseInt(products_count || 0);
+          items_per_page = parseInt(items_per_page || 20);
+          const total_page_number =
+            products_count && items_per_page
+              ? Math.ceil(products_count / items_per_page)
+              : 0;
+          const gotoPreviousPage = function (e) {
+            e.preventDefault();
+            if (current_page > 1) {
+              store.dispatch("changeCollectionPage", current_page - 1);
+            }
+          };
+
+          const gotoNextPage = function (e) {
+            e.preventDefault();
+            if (current_page < total_page_number) {
+              store.dispatch("changeCollectionPage", current_page + 1);
+            }
+          };
+
+          const gotoThisPage = function (e) {
+            e.preventDefault();
+            const target_page = e.target.dataset.value;
+            store.dispatch("changeCollectionPage", target_page);
+          };
+          return html`{% render "collection-pagination" %}`;
+        };
+      },
+    },
+    {
+      tagName: "collection-products-list",
+      observedAttributes: ["product_handles"],
+      definition: function (html, hooks) {
+        return function () {
+          return html``;
+        };
+      },
+    },
+  ];
 </script>

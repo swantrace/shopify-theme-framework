@@ -70,13 +70,8 @@
 
   </div>
 
-  {% if paginate.pages > 1 %}
-    <hr class="hr--clear">
+  <collection-pagination collection-page-controller></collection-pagination>
 
-    <div class="text-center">
-      {% include 'pagination-custom' %}
-    </div>
-  {% endif %}
 </div>
 {% endpaginate %}
 

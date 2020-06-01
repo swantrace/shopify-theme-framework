@@ -443,7 +443,7 @@ export default async () => {
             (current_tags = new URL(current_page_url).pathname.split("/")[3]);
         }
         search_params.get("page") &&
-          (params["page"] = search_params.get("constraint"));
+          (params["page"] = search_params.get("page"));
         search_params.get("sort_by") &&
           (params["sort_by"] = search_params.get("sort_by"));
 

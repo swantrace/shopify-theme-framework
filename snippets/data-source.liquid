@@ -67,6 +67,7 @@
 "products_count": {{ collection.products_count | json }},
 "tags": {{ collection.tags | json }},
 "page": {{ current_page | default: 1 }},
+"items_per_page": 20,
 "current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
 "sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
 "view_type": "grid",

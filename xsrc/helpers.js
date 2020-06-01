@@ -30,6 +30,15 @@ const handleize = (str) => {
   return str;
 };
 
-window[window.themeName].helpers = { throwIfMissing, encodedStr, handleize };
+const range = (start, end) => {
+  return new Array(end - start + 1).fill(undefined).map((_, i) => i + start);
+};
 
-export { throwIfMissing, encodedStr, handleize };
+window[window.themeName].helpers = {
+  throwIfMissing,
+  encodedStr,
+  handleize,
+  range,
+};
+
+export { throwIfMissing, encodedStr, handleize, range };

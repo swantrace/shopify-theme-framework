@@ -3,6 +3,7 @@ import localforage from "localforage";
 import memoryDriver from "localforage-memoryStorageDriver";
 import { setupCache } from "axios-cache-adapter";
 import { throwIfMissing } from "./helpers";
+
 window.theme = window.theme || {};
 window.theme.config = window.theme.config || {};
 window.theme.config.axios = window.theme.config.axios || {};

@@ -4,7 +4,7 @@
 
 {% endcomment %}
 <div id="CartSection" data-section-id="{{ section.id }}" data-section-type="cart-template" data-notes-enable="{{ section.settings.cart_notes_enable }}">
-  <main-cart-form cart-form cart_json="{{ cart | json | escape }}"></main-cart-form>
+  <cart-form cart-form cart_json="{{ cart | json | escape }}"></cart-form>
 </div>
 
 

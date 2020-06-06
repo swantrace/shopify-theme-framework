@@ -1,8 +1,8 @@
 <script>
   window[window.themeName].themeElements = [
     {
-      tagName: "cart-form",
-      observedAttributes: ["cart_json", "cart_is_updating", "old_cart_json"],
+      tagName: 'cart-form',
+      observedAttributes: ['cart_json', 'cart_is_updating', 'old_cart_json'],
       definition: function (html, hooks) {
         return function ({ cart_json, cart_is_updating, old_cart_json }) {
           var [
@@ -19,8 +19,8 @@
       },
     },
     {
-      tagName: "product-atc-form",
-      observedAttributes: ["product_handle", "cart_is_updating"],
+      tagName: 'add-to-cart-form',
+      observedAttributes: ['product_handle', 'cart_is_updating'],
       definition: function (html, hooks) {
         return function ({ product_handle, cart_is_updating }) {
           var [
@@ -29,13 +29,13 @@
             options,
             { onATCButtonClicked, onOptionChanged },
           ] = hooks.useATCForm(product_handle);
-          return html`{% render "product-atc-form" %}`;
+          return html`{% render "add-to-cart-form" %}`;
         };
       },
     },
     {
-      tagName: "collection-tags",
-      observedAttributes: ["current_tags", "all_tags", "tags"],
+      tagName: 'collection-tags',
+      observedAttributes: ['current_tags', 'all_tags', 'tags'],
       definition: function (html, hooks, store, apis) {
         return function ({ current_tags, all_tags, tags }) {
           var [
@@ -49,8 +49,8 @@
       },
     },
     {
-      tagName: "collection-sorting",
-      observedAttributes: ["sort_by", "sort_options"],
+      tagName: 'collection-sorting',
+      observedAttributes: ['sort_by', 'sort_options'],
       definition: function (html, hooks, store, apis) {
         return function ({ sort_by, sort_options }) {
           var [
@@ -62,8 +62,8 @@
       },
     },
     {
-      tagName: "collection-pagination",
-      observedAttributes: ["current_page", "products_count", "items_per_page"],
+      tagName: 'collection-pagination',
+      observedAttributes: ['current_page', 'products_count', 'items_per_page'],
       definition: function (html, hooks, store, apis) {
         return function ({ current_page, products_count, items_per_page }) {
           current_page = parseInt(current_page || 1);
@@ -76,43 +76,43 @@
           const gotoPreviousPage = function (e) {
             e.preventDefault();
             if (current_page > 1) {
-              store.dispatch("changeCollectionPage", current_page - 1);
+              store.dispatch('changeCollectionPage', current_page - 1);
             }
           };
 
           const gotoNextPage = function (e) {
             e.preventDefault();
             if (current_page < total_page_number) {
-              store.dispatch("changeCollectionPage", current_page + 1);
+              store.dispatch('changeCollectionPage', current_page + 1);
             }
           };
 
           const gotoThisPage = function (e) {
             e.preventDefault();
             const target_page = e.target.dataset.value;
-            store.dispatch("changeCollectionPage", target_page);
+            store.dispatch('changeCollectionPage', target_page);
           };
           return html`{% render "collection-pagination" %}`;
         };
       },
     },
     {
-      tagName: "collection-products-list",
-      observedAttributes: ["product_handles", "view_type"],
+      tagName: 'collection-products-list',
+      observedAttributes: ['product_handles', 'view_type'],
       definition: function (html, hooks) {
         return function ({ product_handles, view_type }) {
-          console.log("product_handles:", product_handles);
+          console.log('product_handles:', product_handles);
           product_handles = (product_handles === true || !product_handles
-            ? ""
+            ? ''
             : product_handles
-          ).split(",");
+          ).split(',');
           return html`{% render "collection-products-list" %}`;
         };
       },
     },
     {
-      tagName: "collection-product-grid-item",
-      observedAttributes: ["product_handle", "cart_is_updating"],
+      tagName: 'collection-product-grid-item',
+      observedAttributes: ['product_handle', 'cart_is_updating'],
       definition: function (html, hooks) {
         return function ({ product_handle, cart_is_updating }) {
           console.log(product_handle);
@@ -127,8 +127,8 @@
       },
     },
     {
-      tagName: "collection-product-list-item",
-      observedAttributes: ["product_handle"],
+      tagName: 'collection-product-list-item',
+      observedAttributes: ['product_handle'],
       definition: function (html, hooks) {
         return function ({ product_handle }) {
           return html`{% render "collection-product-list-item" %}`;

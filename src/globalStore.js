@@ -1,6 +1,6 @@
-import ajaxAPIsCreator from "./ajax";
-import Store from "./Store";
-import { adjustCollectionPageURL } from "./helpers";
+import ajaxAPIsCreator from './ajax';
+import Store from './Store';
+import { adjustCollectionPageURL, handleize } from './helpers';
 import {
   enableCartIsUpdating,
   disableCartIsUpdating,
@@ -12,38 +12,55 @@ import {
   setCollectionSortByControllerAttribute,
   setCollectionViewTypeControllerAttribute,
   setCollectionProductsListAttribute,
-} from "./attributeChangers";
+} from './attributeChangers';
 
 const dispatchAjaxFailEvent = (source, error) => {
-  const event = new CustomEvent("ajaxRequestFail", {
+  const event = new CustomEvent('ajaxRequestFail', {
     detail: { data: error.response.data, source },
   });
   document.dispatchEvent(event);
 };
 
 const dispatchAjaxDoneEvent = (source, data) => {
-  const event = new CustomEvent("ajaxRequestDone", {
+  const event = new CustomEvent('ajaxRequestDone', {
     detail: { data, source },
   });
   document.dispatchEvent(event);
 };
 
-const cartTransformFn =
-  window.themeName &&
+const cartTransformFns =
+  (window.themeName &&
+    window[window.themeName] &&
+    window[window.themeName].cartTransformFns) ||
+  [];
+
+const collectionTransformFns = (window.themeName &&
   window[window.themeName] &&
-  window[window.themeName].cartTransformFn &&
-  typeof window[window.themeName].cartTransformFn === "function"
-    ? window[window.themeName].cartTransformFn
-    : function (cart) {
-        return new Promise(function (resolve, reject) {
-          resolve(cart);
-        });
+  window[window.themeName].collectionTransformFns && [
+    ...window[window.themeName].collectionTransformFns,
+    (collection) => {
+      return {
+        ...collection,
+        all_tags: collection.all_tags.map((tag) => {
+          return { label: tag, handle: handleize(tag) };
+        }),
       };
+    },
+  ]) || [
+  (collection) => {
+    return {
+      ...collection,
+      all_tags: collection.all_tags.map((tag) => {
+        return { label: tag, handle: handleize(tag) };
+      }),
+    };
+  },
+];
 
 export default async () => {
   const apis = await ajaxAPIsCreator();
-  const template = window[window.themeName].template;
-  const canonical_url = window[window.themeName].canonical_url;
+  const { template } = window[window.themeName];
+  const { canonical_url } = window[window.themeName];
 
   let initialState = {
     cart: null,
@@ -51,7 +68,7 @@ export default async () => {
   };
 
   switch (template) {
-    case "collection":
+    case 'collection':
       initialState = Object.assign(initialState, {
         collection: null,
         collection_is_updating: false,
@@ -64,7 +81,7 @@ export default async () => {
 
   const actions = {
     addItems(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .addItem({ data: { items: payload } })
         .then(function (items) {
@@ -74,37 +91,39 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxDoneEvent("addItems", cart);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxDoneEvent('addItems', cart);
         })
         .catch((error) => {
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxFailEvent("addItems", error);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxFailEvent('addItems', error);
         });
     },
     addItemFromForm(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .addItem({ data: new FormData(payload) })
-        .then(function (items) {
-          return apis.getCart();
+        .then(() => apis.getCart())
+        .then((cart) => {
+          return cartTransformFns.reduce((p, fn) => {
+            // eslint-disable-next-line no-debugger
+            debugger;
+            return p.then(fn);
+          }, Promise.resolve(cart));
         })
         .then((cart) => {
-          return cartTransformFn(cart);
-        })
-        .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxDoneEvent("addItemFromForm", cart);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxDoneEvent('addItemFromForm', cart);
         })
         .catch((error) => {
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxFailEvent("addItemFromForm", error);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxFailEvent('addItemFromForm', error);
         });
     },
     addItem(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .addItem({
           data: {
@@ -113,24 +132,25 @@ export default async () => {
             properties: payload.properties,
           },
         })
-        .then(function (items) {
-          return apis.getCart();
+        .then(() => apis.getCart())
+        .then((cart) => {
+          return cartTransformFns.reduce((p, fn) => {
+            return p.then(fn);
+          }, Promise.resolve(cart));
+          // cartTransformFn(cart);
         })
         .then((cart) => {
-          return cartTransformFn(cart);
-        })
-        .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxDoneEvent("addItem", cart);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxDoneEvent('addItem', cart);
         })
         .catch((error) => {
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxFailEvent("addItem", error);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxFailEvent('addItem', error);
         });
     },
     changeItemByLine(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .changeItem({
           data: { line: payload.line, quantity: payload.quantity },
@@ -139,9 +159,9 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxDoneEvent("changeItemByLine", cart);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxDoneEvent('changeItemByLine', cart);
           if (cart.items.find((item, index) => index == payload.line - 1)) {
             const modifiedItem = cart.items.find(
               (item, index) => index == payload.line - 1
@@ -151,7 +171,7 @@ export default async () => {
                 response: {
                   data: {
                     description: `All ${modifiedItem.quantity} ${modifiedItem.title} are in your cart.`,
-                    message: "Cart Error",
+                    message: 'Cart Error',
                     status: 200,
                   },
                 },
@@ -160,12 +180,12 @@ export default async () => {
           }
         })
         .catch((error) => {
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxFailEvent("changeItemByLine", error);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxFailEvent('changeItemByLine', error);
         });
     },
     changeItemByKey(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .changeItem({
           data: { id: payload.key, quantity: payload.quantity },
@@ -174,9 +194,9 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxDoneEvent("changeItemByKey", cart);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxDoneEvent('changeItemByKey', cart);
           if (cart.items.find((item) => item.key == payload.key)) {
             const modifiedItem = cart.items.find(
               (item) => item.key == payload.key
@@ -186,7 +206,7 @@ export default async () => {
                 response: {
                   data: {
                     description: `All ${modifiedItem.quantity} ${modifiedItem.title} are in your cart.`,
-                    message: "Cart Error",
+                    message: 'Cart Error',
                     status: 200,
                   },
                 },
@@ -195,12 +215,12 @@ export default async () => {
           }
         })
         .catch((error) => {
-          context.commit("setCartIsUpdating", false);
-          dispatchAjaxFailEvent("changeItemByKey", error);
+          context.commit('setCartIsUpdating', false);
+          dispatchAjaxFailEvent('changeItemByKey', error);
         });
     },
     removeItemByLine(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .changeItem({
           data: { line: payload, quantity: 0 },
@@ -209,16 +229,16 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("removeItemByLine", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('removeItemByLine', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     removeItemByKey(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .changeItem({
           data: { id: payload, quantity: 0 },
@@ -227,16 +247,16 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("removeItemByKey", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('removeItemByKey', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     updateCartFromForm(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .updateCart({
           data: new FormData(payload),
@@ -245,16 +265,16 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("updateCartFromForm", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('updateCartFromForm', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     updateCartAttributes(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .updateCart({
           data: { attributes: payload },
@@ -263,16 +283,16 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("updateCartAttributes", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('updateCartAttributes', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     updateCartNote(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .updateCart({
           data: { note: payload },
@@ -281,39 +301,40 @@ export default async () => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("updateCartNote", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('updateCartNote', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     clearCart(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis
         .clearCart()
         .then((cart) => {
           return cartTransformFn(cart);
         })
         .then((cart) => {
-          context.commit("setCart", cart);
-          context.commit("setCartIsUpdating", false);
+          context.commit('setCart', cart);
+          context.commit('setCartIsUpdating', false);
         })
         .catch((error) => {
-          dispatchAjaxFailEvent("clearCart", error);
-          context.commit("setCartIsUpdating", false);
+          dispatchAjaxFailEvent('clearCart', error);
+          context.commit('setCartIsUpdating', false);
         });
     },
     changeCollectionCurrentTags(context, payload) {
       console.log(payload);
       if (context.state.collection !== undefined) {
-        context.commit("setCollectionCurrentTags", payload);
-        context.commit("setCollectionIsUpdating", true);
-        let current_tags, params;
+        context.commit('setCollectionCurrentTags', payload);
+        context.commit('setCollectionIsUpdating', true);
+        let current_tags;
+        let params;
         if (
-          context.state.collection.handle === "types" ||
-          context.state.collection.handle === "vendors"
+          context.state.collection.handle === 'types' ||
+          context.state.collection.handle === 'vendors'
         ) {
           params = {
             q: context.state.collection.title,
@@ -338,26 +359,27 @@ export default async () => {
         apis
           .getCollection({
             handle: context.state.collection.handle,
-            view: "theme",
+            view: 'theme',
             params,
             current_tags,
           })
           .then(({ products, products_count }) => {
-            context.commit("setCollectionProductsCount", products_count);
-            context.commit("setCollectionPage", 1);
-            context.commit("setCollectionProducts", products);
-            context.commit("setCollectionIsUpdating", false);
+            context.commit('setCollectionProductsCount', products_count);
+            context.commit('setCollectionPage', 1);
+            context.commit('setCollectionProducts', products);
+            context.commit('setCollectionIsUpdating', false);
           });
       }
     },
     changeCollectionPage(context, payload) {
       if (context.state.collection) {
-        context.commit("setCollectionPage", payload);
-        context.commit("setCollectionIsUpdating", true);
-        let current_tags, params;
+        context.commit('setCollectionPage', payload);
+        context.commit('setCollectionIsUpdating', true);
+        let current_tags;
+        let params;
         if (
-          context.state.collection.handle === "types" ||
-          context.state.collection.handle === "vendors"
+          context.state.collection.handle === 'types' ||
+          context.state.collection.handle === 'vendors'
         ) {
           params = {
             q: context.state.collection.title,
@@ -382,25 +404,26 @@ export default async () => {
         apis
           .getCollection({
             handle: context.state.collection.handle,
-            view: "theme",
+            view: 'theme',
             params,
             current_tags,
           })
           .then(({ products }) => {
-            context.commit("setCollectionProducts", products);
-            context.commit("setCollectionIsUpdating", false);
+            context.commit('setCollectionProducts', products);
+            context.commit('setCollectionIsUpdating', false);
           });
       }
     },
     changeCollectionSortBy(context, payload) {
       if (context.state.collection) {
-        context.commit("setCollectionSortBy", payload);
-        context.commit("setCollectionIsUpdating", true);
+        context.commit('setCollectionSortBy', payload);
+        context.commit('setCollectionIsUpdating', true);
 
-        let current_tags, params;
+        let current_tags;
+        let params;
         if (
-          context.state.collection.handle === "types" ||
-          context.state.collection.handle === "vendors"
+          context.state.collection.handle === 'types' ||
+          context.state.collection.handle === 'vendors'
         ) {
           params = {
             q: context.state.collection.title,
@@ -425,31 +448,36 @@ export default async () => {
         apis
           .getCollection({
             handle: context.state.collection.handle,
-            view: "theme",
+            view: 'theme',
             params,
             current_tags,
           })
           .then(({ products }) => {
-            context.commit("setCollectionProducts", products);
-            context.commit("setCollectionIsUpdating", false);
+            context.commit('setCollectionProducts', products);
+            context.commit('setCollectionIsUpdating', false);
           });
       }
     },
     changeCollectionViewType(context, payload) {
       if (context.state.collection) {
-        context.commit("setCollectionViewType", payload);
+        context.commit('setCollectionViewType', payload);
       }
     },
     initiate(context, payload) {
-      context.commit("setCartIsUpdating", true);
+      context.commit('setCartIsUpdating', true);
       apis.getCart().then((cart) => {
-        context.commit("setCart", cart);
-        context.commit("setCartIsUpdating", false);
+        context.commit('setCart', cart);
+        context.commit('setCartIsUpdating', false);
       });
       if (context.state.collection !== undefined) {
-        context.commit("setCartIsUpdating", true);
-        context.commit("setCollectionIsUpdating", true);
-        let current_tags, handle, page, sort_by, params, search_params;
+        context.commit('setCartIsUpdating', true);
+        context.commit('setCollectionIsUpdating', true);
+        let current_tags;
+        let handle;
+        let page;
+        let sort_by;
+        let params;
+        let search_params;
         const current_page_url =
           window.themeName &&
           window[window.themeName] &&
@@ -457,32 +485,36 @@ export default async () => {
             ? window[window.themeName].canonical_url
             : window.location.href;
 
-        handle = new URL(current_page_url).pathname.split("/")[2];
+        handle = new URL(current_page_url).pathname.split('/')[2];
         search_params = new URL(current_page_url).searchParams;
         params = {};
-        if (handle === "types" || handle === "vendors") {
-          params["q"] = search_params.get("q");
-          search_params.get("constraint") &&
-            (params["constraint"] = search_params.get("constraint"));
+        if (handle === 'types' || handle === 'vendors') {
+          params.q = search_params.get('q');
+          search_params.get('constraint') &&
+            (params.constraint = search_params.get('constraint'));
         } else {
-          new URL(current_page_url).pathname.split("/").length > 3 &&
-            (current_tags = new URL(current_page_url).pathname.split("/")[3]);
+          new URL(current_page_url).pathname.split('/').length > 3 &&
+            (current_tags = new URL(current_page_url).pathname.split('/')[3]);
         }
-        search_params.get("page") &&
-          (params["page"] = search_params.get("page"));
-        search_params.get("sort_by") &&
-          (params["sort_by"] = search_params.get("sort_by"));
+        search_params.get('page') && (params.page = search_params.get('page'));
+        search_params.get('sort_by') &&
+          (params.sort_by = search_params.get('sort_by'));
 
         apis
           .getCollection({
             handle,
-            view: "theme",
+            view: 'theme',
             params,
             current_tags,
           })
           .then((collection) => {
-            context.commit("setCollection", collection);
-            context.commit("setCollectionIsUpdating", false);
+            return collectionTransformFns.reduce((p, fn) => {
+              return p.then(fn);
+            }, Promise.resolve(collection));
+          })
+          .then((collection) => {
+            context.commit('setCollection', collection);
+            context.commit('setCollectionIsUpdating', false);
           });
       }
     },
@@ -538,21 +570,21 @@ export default async () => {
 
   store.subscribe(function (keysArr, newValue, oldValue) {
     switch (keysArr[0]) {
-      case "cart_is_updating":
-        if (typeof window[themeName].onCartIsUpdatingChanged === "function") {
+      case 'cart_is_updating':
+        if (typeof window[themeName].onCartIsUpdatingChanged === 'function') {
           window[themeName].onCartIsUpdatingChanged(newValue);
         } else {
           newValue === true ? enableCartIsUpdating() : disableCartIsUpdating();
         }
         break;
-      case "cart":
-        if (typeof window[themeName].onCartChanged === "function") {
+      case 'cart':
+        if (typeof window[themeName].onCartChanged === 'function') {
           window[themeName].onCartChanged(newValue, oldValue);
         } else {
           setCartAttribute(newValue, oldValue);
         }
         break;
-      case "collection":
+      case 'collection':
         if (!oldValue) {
           setCollectionTagsFilterAttribute(newValue);
           setCollectionPageControllerAttribute(newValue);
@@ -561,19 +593,19 @@ export default async () => {
           setCollectionProductsListAttribute(newValue);
         } else {
           switch (keysArr[1]) {
-            case "current_tags":
+            case 'current_tags':
               setCollectionTagsFilterAttribute(newValue);
               break;
-            case "page":
+            case 'page':
               setCollectionPageControllerAttribute(newValue);
               break;
-            case "sort_by":
+            case 'sort_by':
               setCollectionSortByControllerAttribute(newValue);
               break;
-            case "view_type":
+            case 'view_type':
               setCollectionViewTypeControllerAttribute(newValue);
               break;
-            case "products":
+            case 'products':
               setCollectionProductsListAttribute(newValue);
               setCollectionPageControllerAttribute(newValue);
               break;
@@ -581,9 +613,9 @@ export default async () => {
               break;
           }
         }
-      case "collection_is_updating":
+      case 'collection_is_updating':
         if (
-          typeof window[themeName].onCollectionIsUpdatingChanged === "function"
+          typeof window[themeName].onCollectionIsUpdatingChanged === 'function'
         ) {
           window[themeName].onCollectionIsUpdatingChanged(newValue);
         } else {

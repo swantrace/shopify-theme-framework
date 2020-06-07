@@ -2,7 +2,7 @@ import axios from 'axios';
 import localforage from 'localforage';
 import memoryDriver from 'localforage-memoryStorageDriver';
 import { setupCache } from 'axios-cache-adapter';
-import { throwIfMissing, handleize } from './helpers';
+import { handleize } from './helpers';
 
 window.theme = window.theme || {};
 window.theme.config = window.theme.config || {};
@@ -29,8 +29,8 @@ export default async () => {
   const instance = axios.create(config);
   const themeId = window.theme.id;
   const ajaxFunctionPromiseCreator = function ajaxFunctionPromiseCreator({
-    method = throwIfMissing('method'),
-    url = throwIfMissing('url'),
+    method,
+    url,
   } = {}) {
     const fn = ({
       baseURL = null,

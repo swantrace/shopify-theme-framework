@@ -351,6 +351,7 @@ export default async () => {
         }
 
         adjustCollectionPageURL(
+          canonical_url,
           params,
           current_tags,
           context.state.collection.handle

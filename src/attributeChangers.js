@@ -1,4 +1,4 @@
-import { encodedStr } from './helpers';
+import { escapeStr } from './helpers';
 
 const enableCartIsUpdating = () => {
   document
@@ -30,8 +30,8 @@ const disableCollectionIsUpdating = () => {
 
 const setCartAttribute = (newValue, oldValue) => {
   document.querySelectorAll(`[cart-form]`).forEach((el) => {
-    el.setAttribute('old_cart_json', encodedStr(JSON.stringify(oldValue)));
-    el.setAttribute('cart_json', encodedStr(JSON.stringify(newValue)));
+    el.setAttribute('old_cart_json', escapeStr(JSON.stringify(oldValue)));
+    el.setAttribute('cart_json', escapeStr(JSON.stringify(newValue)));
   });
 };
 
@@ -39,7 +39,7 @@ const setCollectionTagsFilterAttribute = (newValue) => {
   document.querySelectorAll(`[collection-tags-filter]`).forEach((el) => {
     el.setAttribute('current_tags', newValue.current_tags);
     el.setAttribute('tags', newValue.tags);
-    el.setAttribute('all_tags', encodedStr(JSON.stringify(newValue.all_tags)));
+    el.setAttribute('all_tags', escapeStr(JSON.stringify(newValue.all_tags)));
   });
 };
 
@@ -56,7 +56,7 @@ const setCollectionSortByControllerAttribute = (newValue) => {
     el.setAttribute('sort_by', newValue.sort_by);
     el.setAttribute(
       'sort_options',
-      encodedStr(JSON.stringify(newValue.sort_options))
+      escapeStr(JSON.stringify(newValue.sort_options))
     );
   });
 };

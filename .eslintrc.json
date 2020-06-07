@@ -8,5 +8,10 @@
   },
   "extends": ["airbnb-base", "prettier"],
   "plugins": ["prettier"],
-  "rules": {}
+  "rules": {
+    "no-param-reassign": [
+      "error",
+      { "props": true, "ignorePropertyModificationsFor": ["state"] }
+    ]
+  }
 }

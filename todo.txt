@@ -547,6 +547,30 @@ normal getProduct return
   }
 }
 
+how to expose a global variable, like app,
+app.init(config)
+app.addElement(tagName: string, type: string, fn)
+
+创建一个function, we can put this function to src folder
+这个function，
+能够接收一个type（element tap） 参数， 
+一个tagName参数
+一个(html, hook) => (attributes) => {
+  const obj = hook(attributes);
+  return html`{% render '' %}`;
+ } function
+
+ hook try if I can return an object
+
+ 要弄一个elementTypes的文件，theme developer 可以轻松的call一个register 的function
+ 分开两个projects，一个是src folder 里的东西
+ 另外一个是 minimum theme， 以官方minimum theme 为蓝本
+
+ 
+
+
+什么样的地方需要变成element， 有用户操作的，有loop的
+运行之后
 
  
 

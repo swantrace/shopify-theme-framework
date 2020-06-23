@@ -4,13 +4,7 @@ import memoryDriver from 'localforage-memoryStorageDriver';
 import { setupCache } from 'axios-cache-adapter';
 import { handleize } from './helpers';
 
-window.theme = window.theme || {};
-window.theme.config = window.theme.config || {};
-window.theme.config.axios = window.theme.config.axios || {};
-window.theme.config.cache = window.theme.config.cache || {};
-window.theme.id = window.theme.id || null;
-
-export default async () => {
+export default async (config, shop) => {
   await localforage.defineDriver(memoryDriver);
   const forageStore = localforage.createInstance({
     driver: [
@@ -21,13 +15,13 @@ export default async () => {
     ],
     name: 'db-cache',
   });
-  const cache = setupCache({ ...theme.config.cache, store: forageStore });
-  const config = {
-    ...window.theme.config.axios,
+  const cache = setupCache({ ...config.cache, store: forageStore });
+  const axiosConfig = {
+    ...config.axios,
     adapter: cache.adapter,
   };
-  const instance = axios.create(config);
-  const themeId = window.theme.id;
+  const instance = axios.create(axiosConfig);
+  const { themeId } = shop;
   const ajaxFunctionPromiseCreator = function ajaxFunctionPromiseCreator({
     method,
     url,

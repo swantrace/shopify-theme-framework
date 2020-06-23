@@ -5,6 +5,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'assets'),
     filename: 'theme.js',
+    library: 'App',
   },
   module: {
     rules: [

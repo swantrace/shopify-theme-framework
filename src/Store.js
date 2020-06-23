@@ -52,8 +52,7 @@ export default class Store {
   commit(mutationKey, payload) {
     if (typeof this.mutations[mutationKey] === 'function') {
       this.status = 'mutation';
-      const newState = this.mutations[mutationKey](this.state, payload);
-      this.state = Object.assign(this.state, newState);
+      this.mutations[mutationKey](this.state, payload);
       return true;
     }
     throw new Error(`Mutation "${mutationKey}" doesn't exist`);
@@ -68,7 +67,7 @@ export default class Store {
    */
   runCallbacks(key, value, oldValue) {
     this.callbacks[key] = this.callbacks[key] || [];
-    this.callbacks[key].forEach((callback) => callback(value, oldValue));
+    this.callbacks[key].forEach((callback) => callback(key, value, oldValue));
     return true;
   }
 

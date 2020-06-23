@@ -1,0 +1,15 @@
+<script>
+  window.addEventListener('load', function () {
+    App.init({
+      config: {% render 'config' %},
+      shopify: {% render 'shopify' %},
+      customElementGroupDefinitions: {% render 'custom-elements'%},
+      transformFns: {% render 'transform-fns'%},
+      settings: theme.settings,
+      locales: theme.locales,
+    })
+    .then(app => {
+      {% render 'global-callback' %}
+    });
+  });
+</script>

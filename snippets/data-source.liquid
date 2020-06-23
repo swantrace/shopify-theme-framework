@@ -46,11 +46,12 @@
 "body_html": {{ collection.body_html | json }},
 "handle": {{ collection.handle | json }},
 "id": {{ collection.id | json }},
-"published_at": {{ collection.published_at | json }},
+"disjunctive": {{ collection.disjunctive | json }},
+"published_at": "{{ collection.published_at }}",
 "published_scope": {{ collection.published_scope | json }},
 "sort_order": {{ collection.sort_order | json }},
 "template_suffix": {{ collection.template_suffix | json }},
-"updated_at": {{ collection.published_at | json }}
+"updated_at": "{{ collection.published_at }}"
 {% endcapture %}
 {% endif %}
 {% capture other_data %}
@@ -63,11 +64,11 @@
 "default_sort_by": {{ collection.default_sort_by | json }},
 "description":{{ collection.description | json }},
 "image":{{ collection.image | json }},
-"products": [{% paginate collection.products by 20 %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+"products_handles": [{% paginate collection.products by 50 %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
 "products_count": {{ collection.products_count | json }},
 "tags": {{ collection.tags | json }},
 "page": {{ current_page | default: 1 }},
-"items_per_page": 20,
+"items_per_page": 50,
 "current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
 "sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
 "view_type": "grid",

@@ -15,26 +15,29 @@ ${product?html`
         <span class="badge badge--sale">
           <span
             class="badge__text{% if sale_text.size > 7 %} badge__text--small{% endif %}"
-            >{{ "products.product.sale" | t }}</span
+            >{{ 'products.product.sale' | t }}</span
           >
         </span>
         {% endif %} {% if section.settings.show_sold_out_circle %}
         <span class="badge badge--sold-out">
           <span
             class="badge__text{% if sold_out_text.size > 9 %} badge__text--small{% endif %}"
-            >{{ "products.product.sold_out" | t }}</span
+            >{{ 'products.product.sold_out' | t }}</span
           >
         </span>
         {% endif %}
         <span class="grid-link__image-centered">
           {% if featured.title != '' %}
-          <img src="${ product.featured_image }" class="product__img" />
+          <img
+            src="${ product.featured_image?product.featured_image.replace('.jpg', '_300x300.jpg'): ''}"
+            class="product__img"
+          />
           {% else %} {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{%
           endcapture %}
           {{
-            "product-"
+            'product-'
               | append: current
-              | placeholder_svg_tag: "placeholder-svg"
+              | placeholder_svg_tag: 'placeholder-svg'
           }}
           {% endif %}
         </span>

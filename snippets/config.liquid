@@ -1,0 +1,13 @@
+{ 
+  axios: { 
+    baseURL: "{{ shop.secure_url }}" 
+  }, 
+  cache: { 
+    maxAge: 15*60*1000,
+    exclude: { 
+      query: false, 
+      paths: [/.*cart.*/] 
+    }, 
+    debug: false 
+  },
+}

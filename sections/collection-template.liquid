@@ -1,16 +1,16 @@
-{% paginate collection.products by 20 %}
-
 <div id="CollectionSection" data-section-id="{{ section.id }}" data-section-type="collection-template" data-sort-enabled="{{ section.settings.sort_enable }}" data-tags-enabled="{{ section.settings.tags_enable }}">
   <div class="section-header section-header--breadcrumb">
     {% include 'breadcrumb' %}
   </div>
 
   <header class="section-header section-header--large">
-    <h1 class="section-header__title{% if section.settings.tags_enable or section.settings.sort_enable %} section-header__title--left{% endif %}">{{ collection.title }}</h1>
+    <h1 class="section-header__title{% if section.settings.tags_enable or section.settings.sort_enable %} section-header__title--left{% endif %}">
+      {{ collection.title }}
+    </h1>
     {% if section.settings.tags_enable or section.settings.sort_enable %}
     <div class="section-header__link--right">
       {% if section.settings.tags_enable %}
-        <collection-tags collection-tags-filter></collection-tags>
+        <main-collection-tags></main-collection-tags>
       {% endif %}
       {% if section.settings.sort_enable %}
         <collection-sorting collection-sort-by-controller></collection-sorting>
@@ -31,7 +31,7 @@
     {%- assign product_width = 335 -%}
 
     {% if collection.products.size > 0 %}
-      <collection-products-list collection-products-list style="display: flex; flex-wrap: wrap;"></collection-products-list>
+      <main-collection-products-list is_main></main-collection-products-list>
     {% else %}
 
       {% if shop.products_count == 0 %}
@@ -67,12 +67,13 @@
 
   </div>
 
-  <collection-pagination collection-page-controller></collection-pagination>
-
+  <main-collection-pagination></main-collection-pagination>
 </div>
-{% endpaginate %}
-
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-collection'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

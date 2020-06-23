@@ -34,6 +34,11 @@ export const range = (start, end) => {
   return new Array(end - start + 1).fill(undefined).map((_, i) => i + start);
 };
 
+export const capitalize = (s) => {
+  if (typeof s !== 'string') return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 /**
  * @todo the function doesn't work when current_tags is 'all'
  * @todo the function should be moved to another place
@@ -55,4 +60,43 @@ export const adjustCollectionPageURL = (url, params, currentTags, handle) => {
     newUrl += `&page=${params.sort_by}`;
   }
   window.history.pushState(null, '', newUrl);
+};
+
+export const dispatchAjaxFailEvent = (source, error) => {
+  const event = new CustomEvent('ajaxRequestFail', {
+    detail: { data: error.response.data, source },
+  });
+  document.dispatchEvent(event);
+};
+/**
+ *
+ * @param {*} source
+ * @param {*} data
+ */
+export const dispatchAjaxDoneEvent = (source, data) => {
+  const event = new CustomEvent('ajaxRequestDone', {
+    detail: { data, source },
+  });
+  document.dispatchEvent(event);
+};
+
+/**
+ *
+ * @param {Array<function>} transformFns
+ */
+export const transformObject = (transformFns) => (obj) => {
+  return transformFns.reduce((p, fn) => {
+    return p.then(fn);
+  }, Promise.resolve(obj));
+};
+
+export default {
+  range,
+  escapeStr,
+  handleize,
+  capitalize,
+  adjustCollectionPageURL,
+  dispatchAjaxDoneEvent,
+  dispatchAjaxFailEvent,
+  transformObject,
 };

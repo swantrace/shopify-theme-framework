@@ -1,0 +1,15 @@
+export default Object.freeze({
+  attributes: [],
+  cart_level_discount_applications: [],
+  currency: '',
+  item_count: 0,
+  items: [],
+  items_subtotal_price: 0,
+  note: '',
+  original_total_price: 0,
+  requires_shipping: true,
+  token: '',
+  total_discount: 0,
+  total_price: 0,
+  total_weight: 0,
+});

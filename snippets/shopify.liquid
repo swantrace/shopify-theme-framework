@@ -1,0 +1,19 @@
+{ 
+  themeID: {{ theme.id | json }}, 
+  canonicalURL: {{ canonical_url | json }},
+  template: {{ template.name | json }},
+  {%- capture shop_metafield_names -%}
+  {%- render 'metafield-keys', type: 'shop' -%}
+  {%- endcapture -%}
+  {%- assign shop_metafield_names = shop_metafield_names | strip | split: "," -%}
+  {% if shop_metafield_names.size > 0 %}
+  "metafields": {
+    {% for metafield_name in shop_metafield_names %}{{ metafield_name | json }}:{{ shop.metafields[metafield_name] | json }}
+    {% unless forloop.last %},{% endunless %}{% endfor %}
+  },
+  {% else %}
+  "metafields":{
+
+  },
+  {% endif %}
+}

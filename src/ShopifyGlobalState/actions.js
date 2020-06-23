@@ -1,6 +1,7 @@
 /**
  * @file include all the possible actions which can be triggered by website users
  */
+import mapLimit from 'async.maplimit';
 /**
  *
  * @param {*} description
@@ -63,14 +64,9 @@ const handleCartAjaxFail = (context, actionName) => (error) => {
  * @param {*} actionName
  */
 const handleCollectionAjaxDone = (context, actionName) => (collection) => {
-  const { products, productsCount, page, sortBy, currentTags } = collection;
-  context.commit('setCollectionProducts', products);
-  context.commit('setCollectionProductsCount', productsCount);
-  context.commit('setCollectionPage', page);
-  context.commit('setCollectionSorBy', sortBy);
-  context.commit('setCollectionCurrentTags', currentTags);
   context.commit('setCollectionIsUpdating', false);
   dispatchAjaxDoneEvent(actionName, collection);
+  return collection;
 };
 /**
  *
@@ -143,6 +139,99 @@ const cartActionTemplate = (actionName, promiseGenerator) => (
     .then(handleCartAjaxDone(context, actionName))
     .then(validateUpdatedQuantity(payload, actionName))
     .catch(handleCartAjaxFail(context, actionName));
+};
+
+/**
+ *
+ * @param {*} actionName
+ * @todo rebuild the function to get new url making use of canonicalUrl and payload
+ */
+const collectionActionTemplate = (actionName, collectionPropertyName) => (
+  apis,
+  collectionTransformFns,
+  productTransformFns
+) => (context, payload) => {
+  let params;
+  let tmp1 = context.state.collection;
+  tmp1 = { ...tmp1, [collectionPropertyName]: payload };
+  context.commit(actionName.replace('change', 'set'), payload);
+  context.commit('setCollectionIsUpdating', true);
+  if (tmp1.handle === 'vendors' || tmp1.handle === 'types') {
+    params = tmp1.current_tags
+      ? {
+          q: tmp1.title,
+          constraint: tmp1.current_tags,
+          page: tmp1.page,
+          sort_by: tmp1.sort_by,
+        }
+      : {
+          q: tmp1.title,
+          page: tmp1.page,
+          sort_by: tmp1.sort_by,
+        };
+    tmp1.current_tags = null;
+  } else {
+    params = {
+      page: tmp1.page,
+      sort_by: tmp1.sort_by,
+    };
+  }
+  apis
+    .getCollection({
+      view: 'theme',
+      handle: tmp1.handle,
+      params,
+      current_tags: tmp1.current_tags,
+    })
+    .then(transformObject(collectionTransformFns))
+    .then((collection) => {
+      context.commit('setCollection', collection);
+      return collection;
+    })
+    .then((collection) => {
+      const productsHandles = collection.products_handles;
+      const tmp2 = collection;
+      let productsCount = productsHandles.length;
+      return new Promise((resolve, reject) => {
+        mapLimit(
+          productsHandles,
+          5,
+          (productHandle, callback) => {
+            const products = [];
+            apis
+              .getProduct({
+                view: 'theme',
+                handle: productHandle,
+              })
+              .then(transformObject(productTransformFns))
+              .then((product) => {
+                productsCount -= 1;
+                products.push(product);
+                if (products.length === 5 || productsCount === 0) {
+                  context.commit('addCollectionProducts', products);
+                }
+                return product;
+              })
+              .then((product) => {
+                callback(null, product);
+              })
+              .catch((error) => {
+                callback(error);
+              });
+          },
+          (err, results) => {
+            if (err) {
+              reject(err);
+            } else {
+              tmp2.products = results;
+              resolve(tmp2);
+            }
+          }
+        );
+      });
+    })
+    .then(handleCollectionAjaxDone(context, actionName))
+    .catch(handleCollectionAjaxFail(context, actionName));
 };
 
 export const addItems = cartActionTemplate('addItems', (apis, payload) =>
@@ -224,62 +313,32 @@ export const clearCart = cartActionTemplate('clearCart', (apis) =>
   apis.clearCart()
 );
 
-/**
- *
- * @param {*} actionName
- * @todo rebuild the function to get new url making use of canonicalUrl and payload
- */
-const collectionActionTemplate = (actionName) => (
-  apis,
-  collectionTransformFns,
-  canonicalUrl
-) => (context, payload) => {
-  let params;
-  let { currentTags } = payload;
-  const { page, sortBy, handle, title } = payload;
-  context.commit(actionName.replace('change', 'set'), payload);
-  context.commit('setCollectionIsUpdating', true);
-  if (handle === 'vendors' || handle === 'types') {
-    currentTags = '';
-    params = {
-      q: title,
-      constraint: currentTags,
-      page,
-      sortBy,
-    };
-  } else {
-    params = {
-      page,
-      sortBy,
-    };
-  }
-  apis
-    .getCollection({
-      handle,
-      params,
-      currentTags,
-    })
-    .then(transformObject(collectionTransformFns))
-    .then(handleCollectionAjaxDone(context, actionName))
-    .catch(handleCollectionAjaxFail(context, actionName));
-};
-
 export const changeCollectionCurrentTags = collectionActionTemplate(
-  'changeCollectionCurrentTags'
+  'changeCollectionCurrentTags',
+  'current_tags'
 );
 
 export const changeCollectionPage = collectionActionTemplate(
-  'changeCollectionPage'
+  'changeCollectionPage',
+  'page'
 );
 
 export const changeCollectionSortBy = collectionActionTemplate(
-  'changeCollectionSortBy'
+  'changeCollectionSortBy',
+  'sort_by'
 );
 
 export const changeCollectionViewType = (context, payload) => {
   if (context.state.collection) {
     context.commit('setCollectionViewType', payload);
   }
+};
+
+export default {
+  changeCollectionCurrentTags,
+  changeCollectionPage,
+  changeCollectionSortBy,
+  changeCollectionViewType,
 };
 
 // export const initiate = (context, payload) => {

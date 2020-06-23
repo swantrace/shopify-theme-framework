@@ -1,6 +1,12 @@
-import ajaxAPIsCreator from './ajax';
-import Store from './Store';
-import { adjustCollectionPageURL, handleize } from './helpers';
+import ajaxAPIsCreator from '../ajax';
+import Store from '../Store';
+import { handleize } from '../helpers';
+import {
+  cartInitialState,
+  collectionInitialState,
+  productInitialState,
+} from '../types/constants';
+
 import {
   addItem,
   addItemFromForm,
@@ -13,6 +19,10 @@ import {
   removeItemByKey,
   removeItemByLine,
   clearCart,
+  changeCollectionCurrentTags,
+  changeCollectionPage,
+  changeCollectionSortBy,
+  changeCollectionViewType,
 } from './actions';
 import {
   enableCartIsUpdating,
@@ -25,12 +35,18 @@ import {
   setCollectionSortByControllerAttribute,
   setCollectionViewTypeControllerAttribute,
   setCollectionProductsListAttribute,
-} from './attributeChangers';
+} from '../attributeChangers';
 
 const cartTransformFns =
   (window.themeName &&
     window[window.themeName] &&
     window[window.themeName].cartTransformFns) ||
+  [];
+
+const productTransformFns =
+  (window.themeName &&
+    window[window.themeName] &&
+    window[window.themeName].productTransformFns) ||
   [];
 
 const collectionTransformFns = (window.themeName &&
@@ -58,25 +74,14 @@ const collectionTransformFns = (window.themeName &&
 
 export default async () => {
   const apis = await ajaxAPIsCreator();
-  const { template } = window[window.themeName];
-  const { canonical_url } = window[window.themeName];
 
-  let initialState = {
-    cart: null,
+  const initialState = {
+    cart: cartInitialState,
+    collection: collectionInitialState,
+    product: productInitialState,
     cart_is_updating: false,
+    collection_is_updating: false,
   };
-
-  switch (template) {
-    case 'collection':
-      initialState = Object.assign(initialState, {
-        collection: null,
-        collection_is_updating: false,
-      });
-      break;
-
-    default:
-      break;
-  }
 
   const actions = {
     addItem: addItem(apis, cartTransformFns),
@@ -90,49 +95,25 @@ export default async () => {
     removeItemByKey: removeItemByKey(apis, cartTransformFns),
     removeItemByLine: removeItemByLine(apis, cartTransformFns),
     clearCart: clearCart(apis, cartTransformFns),
+    changeCollectionCurrentTags: changeCollectionCurrentTags(
+      apis,
+      collectionTransformFns,
+      productTransformFns
+    ),
+    changeCollectionPage: changeCollectionPage(
+      apis,
+      collectionTransformFns,
+      productTransformFns
+    ),
+    changeCollectionSortBy: changeCollectionSortBy(
+      apis,
+      collectionTransformFns,
+      productTransformFns
+    ),
+    changeCollectionViewType,
   };
 
-  const mutations = {
-    setCart(state, payload) {
-      state.cart = payload;
-      return state;
-    },
-    setCartIsUpdating(state, payload) {
-      state.cart_is_updating = payload;
-      return state;
-    },
-    setCollection(state, payload) {
-      state.collection = payload;
-      return state;
-    },
-    setCollectionProductsCount(state, payload) {
-      state.collection = { ...state.collection, products_count: payload };
-    },
-    setCollectionCurrentTags(state, payload) {
-      state.collection = { ...state.collection, current_tags: payload };
-      return state;
-    },
-    setCollectionPage(state, payload) {
-      state.collection = { ...state.collection, page: payload };
-      return state;
-    },
-    setCollectionSortBy(state, payload) {
-      state.collection = { ...state.collection, sort_by: payload };
-      return state;
-    },
-    setCollectionProducts(state, payload) {
-      state.collection = { ...state.collection, products: payload };
-      return state;
-    },
-    setCollectionViewType(state, payload) {
-      state.collection = { ...state.collection, view_type: payload };
-      return state;
-    },
-    setCollectionIsUpdating(state, payload) {
-      state.collection_is_updating = payload;
-      return state;
-    },
-  };
+  const mutations = {};
 
   const store = new Store({
     actions,

@@ -27,6 +27,7 @@
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "@shopify/theme-addresses": "^3.0.3",
+    "async.maplimit": "^0.5.2",
     "axios": "^0.19.2",
     "axios-cache-adapter": "^2.5.0",
     "babel-loader": "^8.1.0",

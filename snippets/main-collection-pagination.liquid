@@ -4,8 +4,7 @@
     <li class=${current_page == 1?"disabled":""}>
       <a href="" @click=${gotoPreviousPage}>&larr;</a>
     </li>
-    ${window[window.themeName].helpers.range(1,
-    total_page_number).map(i => { return html`
+    ${page_range.map(i => { return html`
     <li class=${i==current_page?"active":""}><a href="" @click=${gotoThisPage} data-value=${i}>${i}</a></li>
     ` })}
     <li class=${current_page == total_page_number?"disabled":""}>

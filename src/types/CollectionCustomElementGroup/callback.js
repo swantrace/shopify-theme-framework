@@ -49,7 +49,7 @@ export default (key, collection, oldCollection) => {
   }
 
   if (
-    diffPaths.includes('current_page') ||
+    diffPaths.includes('page') ||
     diffPaths.includes('products_count') ||
     diffPaths.includes('items_per_page')
   ) {

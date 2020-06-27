@@ -69,8 +69,8 @@
 "tags": {{ collection.tags | json }},
 "page": {{ current_page | default: 1 }},
 "items_per_page": 50,
-"current_tags": {% if collection.handle == 'types' or collection.handle == 'vendors' %}{% if canonical_url contains 'constraint=' %}{{ canonical_url | split: 'constraint=' | last | json }}{% else %}""{% endif %}{% else %}{{ canonical_url | split: '/' | last | remove: collection.handle | json }}{% endif %},
-"sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "best-selling" | json }},
+"current_tags": {{ current_tags | json }},
+"sort_by": {{ collection.sort_by | default: collection.default_sort_by | default: "title-ascending" | json }},
 "view_type": "grid",
 "sort_options": [{% for sort_option in collection.sort_options %}{{l}}"value":{{ sort_option.value | json }}, "name":{{ sort_option.name | json }}{{r}}{% unless forloop.last %}, {% endunless %}{% endfor %}]
 {% endcapture%}

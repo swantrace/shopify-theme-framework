@@ -10,31 +10,32 @@ export default {
       <li>{ onCurrentTagsChanged }: ${onCurrentTagsChanged}</li>
     </ul>`;
   },
-  main: ({ html, hook, locales }) => (element) => {
+  'default-main': ({ html, hook, locales }) => (element) => {
     const [currentTags, allTags, , { onCurrentTagsChanged }] = hook(element);
     return html`${allTags.length > 0
       ? html`
-          <div class="form-horizontal">
-            <label for="BrowseBy">{{ 'collections.sorting.browse' | t }}</label>
-            <select
-              name="BrowseBy"
-              id="BrowseBy"
-              class="btn--tertiary"
-              @change=${onCurrentTagsChanged}
+          <label for="BrowseBy"
+            >${locales[locales.currentLanguage].collections.sorting
+              .browse}</label
+          >
+          <select
+            name="BrowseBy"
+            id="BrowseBy"
+            class="btn--tertiary"
+            @change=${onCurrentTagsChanged}
+          >
+            <option value=""
+              >${locales[locales.currentLanguage].collections.sorting
+                .all_tags}</option
             >
-              <option value=""
-                >${locales[locales.currentLanguage].collections.sorting
-                  .all_tags}</option
-              >
-              ${allTags.map(({ label, handle }) => {
-                return html`<option
-                  value=${handle}
-                  ?selected=${currentTags[0] === handle}
-                  >${label}</option
-                >`;
-              })}
-            </select>
-          </div>
+            ${allTags.map(({ label, handle }) => {
+              return html`<option
+                value=${handle}
+                ?selected=${currentTags[0] === handle}
+                >${label}</option
+              >`;
+            })}
+          </select>
         `
       : html``}`;
   },

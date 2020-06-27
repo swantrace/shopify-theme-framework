@@ -54,6 +54,14 @@ export const cleanCollectionProducts = (id) => (state) => {
   return state;
 };
 
+export const setCollectionIsMain = (id) => (state, payload) => {
+  state[`${id}Collection`] = {
+    ...state[`${id}Collection`],
+    is_main: payload,
+  };
+  return state;
+};
+
 export default {
   'set[id]Collection': setCollection,
   'set[id]CollectionCurrentTags': setCollectionCurrentTags,
@@ -62,4 +70,5 @@ export default {
   'set[id]CollectionViewType': setCollectionViewType,
   'add[id]CollectionProducts': addCollectionProducts,
   'clean[id]CollectionProducts': cleanCollectionProducts,
+  'set[id]CollectionIsMain': setCollectionIsMain,
 };

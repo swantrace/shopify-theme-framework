@@ -8,6 +8,7 @@ import {
   dispatchAjaxFailEvent,
   transformObject,
   capitalize,
+  adjustCollectionPageURL,
 } from '../../helpers';
 /**
  *
@@ -75,6 +76,14 @@ const collectionActionTemplate = (actionName, collectionPropertyName) => (
       page: tmp1.page,
       sort_by: tmp1.sort_by,
     };
+  }
+  if (context.state[`${id}Collection`].is_main) {
+    adjustCollectionPageURL({
+      handle: tmp1.handle,
+      params,
+      currentTags: tmp1.current_tags,
+      defaultSortBy: tmp1.default_sort_by,
+    });
   }
   apis
     .getCollection({
@@ -178,6 +187,7 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
   const { canonicalURL } = shopify;
   const tmp1 = context.state[`${id}Collection`];
   if (is_main) {
+    context.commit(`set${capitalize(id)}CollectionIsMain`, true);
     [, , handle, current_tags] = new URL(canonicalURL).pathname.split('/');
     tmp1.handle = handle;
     tmp1.current_tags = current_tags;
@@ -199,6 +209,7 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
       tmp1.sort_by = sort_by;
     }
   } else {
+    context.commit(`set${capitalize(id)}CollectionIsMain`, false);
     if (handle) {
       tmp1.handle = handle;
     }
@@ -220,7 +231,7 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
     `set${capitalize(id)}CollectionCurrentTags`,
     tmp1.current_tags
   );
-  context.commit(`set${capitalize(id)}CollectionPage`, tmp1.page);
+  context.commit(`set${capitalize(id)}CollectionPage`, parseInt(tmp1.page, 10));
   context.commit(`set${capitalize(id)}CollectionSortBy`, tmp1.sort_by);
   context.commit(`setCollectionIsUpdating`, true);
   if (tmp1.handle === 'vendors' || tmp1.handle === 'types') {
@@ -250,7 +261,9 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
       params,
       current_tags: tmp1.current_tags,
     })
-    .then(transformObject(transformFns.collection))
+    .then((collection) => {
+      return transformObject(transformFns.collection)(collection);
+    })
     .then((collection) => {
       context.commit(`set${capitalize(id)}Collection`, collection);
       return collection;

@@ -3,22 +3,10 @@
     type: 'collection', 
     id: 'main', 
     tagDefinitions: { 
-      'collection-tags': 'main', 
-      'collection-pagination': ({html, hook}) => (element) => {
-        const [
-          current_page,
-          products_count,
-          items_per_page,
-          total_page_number,
-          page_range,
-          { gotoNextPage, gotoPreviousPage, gotoThisPage },
-        ] = hook(element); 
-        return html`{% render 'main-collection-pagination' %}`
-      },
-      'collection-products-list': ({html, hook}) => (element) => {
-        const [products, view_type] = hook(element);
-        return html`{% render 'main-collection-products-list' %}`;
-      },
+      'collection-tags': 'default-main', 
+      'collection-pagination': 'default-main',
+      'collection-sorting': 'default-main',
+      'collection-products-list': 'default-main',
       'collection-product-grid-item': ({html, hook}) => ({product}) => {
         return html`{% render 'main-collection-product-grid-item' %}`;
       },

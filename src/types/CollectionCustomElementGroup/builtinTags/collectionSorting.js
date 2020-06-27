@@ -1,22 +1,35 @@
 export default {
   demo: ({ html, hook }) => (element) => {
-    const [
-      currentPage,
-      productsCount,
-      itemsPerPage,
-      totalPageNumber,
-      pageRange,
-      { gotoNextPage, gotoPreviousPage, gotoThisPage },
-    ] = hook(element);
+    const [sortBy, sortOptions, { onSortByChanged }] = hook(element);
     return html`<ul>
-      <li>currentPage: ${currentPage}</li>
-      <li>productsCount: ${productsCount}</li>
-      <li>itemsPerPage: ${itemsPerPage}</li>
-      <li>totalPageNumber: ${totalPageNumber}</li>
-      <li>pageRange: ${pageRange}</li>
-      <li>{ gotoNextPage }: ${gotoNextPage}</li>
-      <li>{ gotoPreviousPage }: ${gotoPreviousPage}</li>
-      <li>{ gotoThisPage }: ${gotoThisPage}</li>
+      <li>sortBy: ${sortBy}</li>
+      <li>sort_options: ${JSON.stringify(sortOptions)}</li>
+      <li>onSortByChanged: ${onSortByChanged}</li>
     </ul>`;
+  },
+  'default-main': ({ html, hook, locales }) => (element) => {
+    const [sortBy, sortOptions, { onSortByChanged }] = hook(element);
+    return html`
+      <label for="SortBy"
+        >${locales[locales.currentLanguage].collections.sorting.title}</label
+      >
+      <select
+        name="sort_by"
+        id="SortBy"
+        @change=${onSortByChanged}
+        class="btn--tertiary"
+        aria-describedby="a11y-refresh-page-message"
+      >
+        ${sortOptions &&
+        sortOptions.length &&
+        sortOptions.map((option) => {
+          return html`<option
+            value=${option.value}
+            ?selected=${sortBy === option.value}
+            >${option.name}</option
+          >`;
+        })}
+      </select>
+    `;
   },
 };

@@ -44,6 +44,17 @@ export default class App {
                         handle: this.helpers.handleize(tag),
                       };
                     }),
+                    current_tags: (collection.current_tags || []).reduce(
+                      (acc, cur, idx) => {
+                        let current = acc;
+                        if (idx > 0) {
+                          current += '+';
+                        }
+                        current += this.helpers.handleize(cur);
+                        return current;
+                      },
+                      ''
+                    ),
                   };
                 },
               ]
@@ -57,6 +68,17 @@ export default class App {
                         handle: this.helpers.handleize(tag),
                       };
                     }),
+                    current_tags: (collection.current_tags || []).reduce(
+                      (acc, cur, idx) => {
+                        let current = acc;
+                        if (idx > 0) {
+                          current += '+';
+                        }
+                        current += this.helpers.handleize(cur);
+                        return current;
+                      },
+                      ''
+                    ),
                   };
                 },
               ],
@@ -169,6 +191,7 @@ export default class App {
           apis: app.apis,
           settings: app.settings,
           locales: app.locales,
+          shopify: app.shopify,
         });
 
         customElements.define(

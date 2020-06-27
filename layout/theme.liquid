@@ -35,24 +35,9 @@
     <meta name="theme-color" content="{{ settings.color_primary }}" />
 
     <!-- CSS ================================================== -->
-    <link
-      rel="preload"
-      href="{{ 'timber.scss.css' | asset_url }}"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript
-      ><link rel="stylesheet" href="{{ 'timber.scss.css' | asset_url }}"
-    /></noscript>
-    <link
-      rel="preload"
-      href="{{ 'theme.scss.css' | asset_url }}"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript
-      ><link rel="stylesheet" href="{{ 'theme.scss.css' | asset_url }}"
-    /></noscript>
+    {{ 'timber.scss.css' | asset_url | stylesheet_tag }}
+    {{ 'theme.scss.css' | asset_url | stylesheet_tag }}
+
     <script defer src="{{ 'theme.js' | asset_url }}"></script>
     <script defer src="{{ 'locales.js' | asset_url }}"></script>
     <script>

@@ -43,21 +43,31 @@ export const capitalize = (s) => {
  * @todo the function doesn't work when current_tags is 'all'
  * @todo the function should be moved to another place
  */
-export const adjustCollectionPageURL = (url, params, currentTags, handle) => {
+export const adjustCollectionPageURL = ({
+  handle,
+  params,
+  currentTags,
+  defaultSortBy,
+}) => {
   let newUrl = '';
   if (handle === 'types' || handle === 'vendors') {
-    newUrl = `${url.split('?')[0]}?q=${params.q}`;
+    newUrl = `/collections/${handle}?q=${params.q}&`;
     if (params.constraint) {
-      newUrl += `&constraint=${params.constraint}`;
+      newUrl += `constraint=${params.constraint}&`;
     }
   } else {
-    newUrl = `/collections/${handle}/${currentTags}?`;
+    newUrl = currentTags
+      ? `/collections/${handle}/${currentTags}?`
+      : `/collections/${handle}?`;
   }
-  if (params.page) {
-    newUrl += `&page=${params.page}`;
+  if (params.page && params.page !== 1) {
+    newUrl += `page=${params.page}&`;
   }
-  if (params.sort_by) {
-    newUrl += `&page=${params.sort_by}`;
+  if (params.sort_by && params.sort_by !== defaultSortBy) {
+    newUrl += `sort_by=${params.sort_by}&`;
+  }
+  if (newUrl[newUrl.length - 1] === '?' || newUrl[newUrl.length - 1] === '&') {
+    newUrl = newUrl.substring(0, newUrl.length - 1);
   }
   window.history.pushState(null, '', newUrl);
 };

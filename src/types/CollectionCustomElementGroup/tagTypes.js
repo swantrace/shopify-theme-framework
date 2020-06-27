@@ -44,7 +44,7 @@ const collectionProductsList = {
       'created-descending',
     ].includes(rawSortBy)
       ? rawSortBy
-      : 'best-selling';
+      : null;
     const handle = rawHandle;
     const currentTags = rawCurrentTags;
     useEffect(() => {
@@ -147,13 +147,14 @@ const collectionPagination = {
     const gotoThisPage = (e) => {
       e.preventDefault();
       const targetPage = e.target.dataset.value;
-      store.dispatch(`change${capitalize(id)}CollectionPage`, targetPage);
+      store.dispatch(
+        `change${capitalize(id)}CollectionPage`,
+        parseInt(targetPage, 10)
+      );
     };
 
     return [
       currentPage,
-      productsCount,
-      itemsPerPage,
       totalPageNumber,
       pageRange,
       { gotoNextPage, gotoPreviousPage, gotoThisPage },

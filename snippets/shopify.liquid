@@ -2,6 +2,24 @@
   themeID: {{ theme.id | json }}, 
   canonicalURL: {{ canonical_url | json }},
   template: {{ template.name | json }},
+  shopProductsCount: {{ shop.products_count }},
+  placeHolders: {
+    image: `{{ 'image' | placeholder_svg_tag }}`,
+    "collection-1": `{{ 'collection-1' | placeholder_svg_tag }}`,
+    "collection-2": `{{ 'collection-2' | placeholder_svg_tag }}`,
+    "collection-3": `{{ 'collection-3' | placeholder_svg_tag }}`,
+    "collection-4": `{{ 'collection-4' | placeholder_svg_tag }}`,
+    "collection-5": `{{ 'collection-5' | placeholder_svg_tag }}`,
+    "collection-6": `{{ 'collection-6' | placeholder_svg_tag }}`,
+    "lifestyle-1": `{{ 'lifestyle-1' | placeholder_svg_tag }}`,
+    "lifestyle-2": `{{ 'lifestyle-2' | placeholder_svg_tag }}`,
+    "product-1": `{{ 'product-1' | placeholder_svg_tag }}`,
+    "product-2": `{{ 'product-2' | placeholder_svg_tag }}`,
+    "product-3": `{{ 'product-3' | placeholder_svg_tag }}`,
+    "product-4": `{{ 'product-4' | placeholder_svg_tag }}`,
+    "product-5": `{{ 'product-5' | placeholder_svg_tag }}`,
+    "product-6": `{{ 'product-6' | placeholder_svg_tag }}`,
+  },
   {%- capture shop_metafield_names -%}
   {%- render 'metafield-keys', type: 'shop' -%}
   {%- endcapture -%}

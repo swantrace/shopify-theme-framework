@@ -18,7 +18,6 @@ export const setCart = (state, payload) => {
 };
 
 export const setCollection = (state, payload) => {
-  console.log('setCollection\n');
   state.collection = {
     ...state.collection,
     all_products_count: payload.all_products_count,
@@ -34,7 +33,6 @@ export const setCollection = (state, payload) => {
     handle: payload.handle,
     id: payload.id,
     image: payload.image,
-    items_per_page: payload.items_per_page,
     page: payload.page,
     products_count: payload.products_count,
     products_handles: payload.products_handles,

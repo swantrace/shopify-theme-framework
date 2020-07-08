@@ -2,6 +2,8 @@
  * @file includes all the helper functions required by other files
  */
 import slugify from 'slugify';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html';
+import { html, component, useEffect, useState } from 'haunted';
 
 /**
  * escapes a string, similar with shopify's escape filter
@@ -100,6 +102,111 @@ export const transformObject = (transformFns) => (obj) => {
   }, Promise.resolve(obj));
 };
 
+export const formatMoney = (rawCents, format) => {
+  let cents;
+  if (typeof rawCents === 'string') {
+    cents = rawCents.replace('.', '');
+  } else {
+    cents = rawCents;
+  }
+  let value = '';
+  const placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+  const formatString = format || `\${{amount}}`;
+
+  function defaultOption(opt, def) {
+    return typeof opt === 'undefined' ? def : opt;
+  }
+
+  function formatWithDelimiters(
+    rawNumber,
+    rawPrecision,
+    rawThousands,
+    rawDecimal
+  ) {
+    const precision = defaultOption(rawPrecision, 2);
+    const thousands = defaultOption(rawThousands, ',');
+    const decimal = defaultOption(rawDecimal, '.');
+
+    if (Number.isNaN(rawNumber) || rawNumber == null) {
+      return 0;
+    }
+
+    const number = (rawNumber / 100.0).toFixed(precision);
+
+    const parts = number.split('.');
+    const dollarPart = parts[0].replace(
+      /(\d)(?=(\d\d\d)+(?!\d))/g,
+      `$1${thousands}`
+    );
+    const centPart = parts[1] ? decimal + parts[1] : '';
+
+    return dollarPart + centPart;
+  }
+
+  switch (formatString.match(placeholderRegex)[1]) {
+    case 'amount':
+      value = formatWithDelimiters(cents, 2);
+      break;
+    case 'amount_no_decimals':
+      value = formatWithDelimiters(cents, 0);
+      break;
+    case 'amount_with_comma_separator':
+      value = formatWithDelimiters(cents, 2, '.', ',');
+      break;
+    case 'amount_no_decimals_with_comma_separator':
+      value = formatWithDelimiters(cents, 0, '.', ',');
+      break;
+    case 'amount_with_apostrophe_separator':
+      value = formatWithDelimiters(cents, 2, "'", '.');
+      break;
+    default:
+  }
+
+  return formatString.replace(placeholderRegex, value);
+};
+
+export const handliezeTags = (tags) =>
+  (tags || []).map((tag) => {
+    return {
+      label: tag,
+      handle: handleize(tag),
+    };
+  });
+
+export const concatTags = (tags) =>
+  (tags || []).reduce((acc, cur, idx) => {
+    let current = acc;
+    if (idx > 0) {
+      current += '+';
+    }
+    current += handleize(cur);
+    return current;
+  }, '');
+
+export const analyzeCollectionPageURL = (pageURL, rootURL) => {
+  const pathName = new URL(pageURL).pathname;
+  return [
+    pathName
+      .replace(`${rootURL === '/' ? '' : rootURL}/collections/`, '')
+      .split('/')[0],
+    pathName
+      .replace(`${rootURL === '/' ? '' : rootURL}/collections/`, '')
+      .split('/')[1],
+  ];
+};
+
+export const analyzeBlogPageURL = (pageURL, rootURL) => {
+  const pathName = new URL(pageURL).pathname;
+  return [
+    pathName
+      .replace(`${rootURL === '/' ? '' : rootURL}/blogs/`, '')
+      .split('/')[0],
+    pathName
+      .replace(`${rootURL === '/' ? '' : rootURL}/blogs/`, '')
+      .split('/')[2],
+  ];
+};
+
 export default {
   range,
   escapeStr,
@@ -109,4 +216,12 @@ export default {
   dispatchAjaxDoneEvent,
   dispatchAjaxFailEvent,
   transformObject,
+  formatMoney,
+  handliezeTags,
+  concatTags,
+  unsafeHTML,
+  html,
+  component,
+  useEffect,
+  useState,
 };

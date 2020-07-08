@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 export default {
-  demo: ({ html, hook }) => (element) => {
+  demo: ({ helpers, hook, settings, locales, shopify }) => (element) => {
+    const { html } = helpers;
     const [currentTags, allTags, tags, { onCurrentTagsChanged }] = hook(
       element
     );
@@ -10,7 +12,10 @@ export default {
       <li>{ onCurrentTagsChanged }: ${onCurrentTagsChanged}</li>
     </ul>`;
   },
-  'default-main': ({ html, hook, locales }) => (element) => {
+  'default-main': ({ helpers, hook, settings, locales, shopify }) => (
+    element
+  ) => {
+    const { html } = helpers;
     const [currentTags, allTags, , { onCurrentTagsChanged }] = hook(element);
     return html`${allTags.length > 0
       ? html`

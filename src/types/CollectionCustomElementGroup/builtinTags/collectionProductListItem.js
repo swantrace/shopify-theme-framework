@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 export default {
-  demo: ({ html, hook }) => (element) => {
+  demo: ({ helpers, hook, settings, locales, shopify }) => (element) => {
+    const { html } = helpers;
     const [
       product,
       currentVariant,
@@ -14,7 +16,10 @@ export default {
       <li>{ onOptionChanged }: ${onOptionChanged}</li>
     </ul>`;
   },
-  'default-main': ({ html, hook }) => (element) => {
+  'default-main': ({ helpers, hook, settings, locales, shopify }) => (
+    element
+  ) => {
+    const { html } = helpers;
     const [
       product,
       currentVariant,

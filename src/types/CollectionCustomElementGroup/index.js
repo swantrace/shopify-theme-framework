@@ -7,7 +7,7 @@ import callback from './callback';
 import builtinTags from './builtinTags';
 
 export default class CollectionCustomElementGroup extends CustomElementGroup {
-  constructor(id, tagDefinitions, apis, transformFns, shopify) {
+  constructor(id, tagDefinitions, apis, transformFns, shopify, helpers) {
     super(
       id,
       `${id}Collection`,
@@ -20,7 +20,8 @@ export default class CollectionCustomElementGroup extends CustomElementGroup {
       tagDefinitions,
       tagTypes,
       builtinTags,
-      shopify
+      shopify,
+      helpers
     );
   }
 }

@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 export default {
-  demo: ({ html, hook }) => (element) => {
+  demo: ({ helpers, hook, settings, locales, shopify }) => (element) => {
+    const { html } = helpers;
     const [sortBy, sortOptions, { onSortByChanged }] = hook(element);
     return html`<ul>
       <li>sortBy: ${sortBy}</li>
@@ -7,7 +9,10 @@ export default {
       <li>onSortByChanged: ${onSortByChanged}</li>
     </ul>`;
   },
-  'default-main': ({ html, hook, locales }) => (element) => {
+  'default-main': ({ helpers, hook, settings, locales, shopify }) => (
+    element
+  ) => {
+    const { html } = helpers;
     const [sortBy, sortOptions, { onSortByChanged }] = hook(element);
     return html`
       <label for="SortBy"

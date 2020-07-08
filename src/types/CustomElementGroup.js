@@ -1,5 +1,4 @@
 import CustomElementTag from './CustomElementTag';
-import { capitalize } from '../helpers';
 
 export default class CustomElementGroup {
   constructor(
@@ -14,7 +13,8 @@ export default class CustomElementGroup {
     tagDefinitions,
     tagTypes,
     builtinTags,
-    shopify
+    shopify,
+    helpers
   ) {
     if (new.target === CustomElementGroup) {
       throw new Error('cannot initialize abstract class');
@@ -26,17 +26,16 @@ export default class CustomElementGroup {
     this.actions = {};
     this.mutations = {};
     this.initialState = { ...initialState };
-    this.shopify = shopify;
     this.tags = [];
     Object.keys(actions).forEach((actionName) => {
       this.addAction(
-        actionName.replace('[id]', capitalize(this.id)),
+        actionName.replace('[id]', helpers.capitalize(this.id)),
         actions[actionName](this.id, apis, transformFns, shopify)
       );
     });
     Object.keys(mutations).forEach((mutationName) => {
       this.addMutation(
-        mutationName.replace('[id]', capitalize(this.id)),
+        mutationName.replace('[id]', helpers.capitalize(this.id)),
         mutations[mutationName](this.id)
       );
     });
@@ -50,7 +49,7 @@ export default class CustomElementGroup {
         tag = new CustomElementTag(
           tagName,
           observedAttributes,
-          hook(this.id),
+          hook(this.id, helpers),
           definition
         );
       } else if (
@@ -60,14 +59,14 @@ export default class CustomElementGroup {
         tag = new CustomElementTag(
           tagName,
           observedAttributes,
-          hook(this.id),
+          hook(this.id, helpers),
           builtinTagsByKey[definition]
         );
       } else {
         tag = new CustomElementTag(
           tagName,
           observedAttributes,
-          hook(this.id),
+          hook(this.id, helpers),
           builtinTagsByKey.demo
         );
       }

@@ -1,6 +1,5 @@
-import { useEffect } from 'haunted';
-import { capitalize } from '../../helpers';
-
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
 const collectionProductsList = {
   observedAttributes: [
     'products',
@@ -12,7 +11,8 @@ const collectionProductsList = {
     'handle',
     'current_tags',
   ],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
+    const { useEffect, capitalize } = helpers;
     const {
       products: rawProducts,
       view_type: rawViewType,
@@ -57,33 +57,36 @@ const collectionProductsList = {
         current_tags: currentTags,
       });
     }, []);
-    return [products, viewType];
+    return [products, viewType, handle];
   },
 };
 
 const collectionProductGridItem = {
   observedAttributes: ['product', 'view_type'],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     // todo finish hook for collectionProductGridItem
-    console.log(store, id);
-    const { product } = element;
-    return [product];
+    const { useEffect, capitalize } = helpers;
+    const { product, view_type } = element;
+    const collection_handle = element.getAttribute('collection_handle');
+    const product_index = element.getAttribute('product_index');
+    return [product, view_type, collection_handle, product_index];
   },
 };
 
 const collectionProductListItem = {
   observedAttributes: ['product', 'view_type'],
-  hook: (id) => (store) => (element) => {
-    // todo finish hook for collectionProductListItem
-    console.log(store, id);
-    const { product } = element;
-    return [product];
+  hook: (id, helpers) => (store) => (element) => {
+    // todo finish hook for collectionProductGridItem
+    const { useEffect, capitalize } = helpers;
+    const { product, view_type, collection_handle, product_index } = element;
+    return [product, view_type, collection_handle, product_index];
   },
 };
 
 const collectionTags = {
   observedAttributes: ['current_tags', 'all_tags', 'tags'],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
+    const { useEffect, capitalize } = helpers;
     const {
       current_tags: rawCurrentTags,
       all_tags: rawAllTags,
@@ -106,65 +109,61 @@ const collectionTags = {
   },
 };
 
-const collectionPagination = {
-  observedAttributes: ['current_page', 'products_count', 'items_per_page'],
-  hook: (id) => (store, apis, helpers) => (element) => {
-    const {
-      current_page: rawCurrentPage,
-      products_count: rawProductsCount,
-      items_per_page: rawItemsPerPage,
-    } = element;
-    const currentPage = parseInt(rawCurrentPage || 1, 10);
-    const productsCount = parseInt(rawProductsCount || 0, 10);
-    const itemsPerPage = parseInt(rawItemsPerPage || 20, 10);
-    const totalPageNumber =
-      productsCount && itemsPerPage
-        ? Math.ceil(productsCount / itemsPerPage)
-        : 0;
+const collectionBreadcrumb = {
+  observedAttributes: ['current_tags'],
+  hook: (id, helpers) => (store) => (element) => {},
+};
 
-    const pageRange = helpers.range(1, totalPageNumber);
+const collectionPagination = {
+  observedAttributes: ['paginate'],
+  hook: (id, helpers) => (store) => (element) => {
+    const { capitalize } = helpers;
+    const { paginate: rawPaginate } = element;
+    const paginate = JSON.parse(rawPaginate || '{}');
 
     const gotoPreviousPage = (e) => {
       e.preventDefault();
-      if (currentPage > 1) {
+      if (paginate && paginate.current_page && paginate.current_page > 1) {
         store.dispatch(
           `change${capitalize(id)}CollectionPage`,
-          currentPage - 1
+          paginate.current_pagent - 1
         );
+        window.scrollTo(0, 0);
       }
     };
 
     const gotoNextPage = (e) => {
       e.preventDefault();
-      if (currentPage < totalPageNumber) {
+      if (
+        paginate &&
+        paginate.current_page &&
+        paginate.current_page < paginate.pages
+      ) {
         store.dispatch(
           `change${capitalize(id)}CollectionPage`,
-          currentPage + 1
+          paginate.current_page + 1
         );
+        window.scrollTo(0, 0);
       }
     };
 
     const gotoThisPage = (e) => {
       e.preventDefault();
-      const targetPage = e.target.dataset.value;
-      store.dispatch(
-        `change${capitalize(id)}CollectionPage`,
-        parseInt(targetPage, 10)
-      );
+      const targetPage = parseInt(e.target.dataset.value, 10);
+      if (Number.isInteger(targetPage)) {
+        store.dispatch(`change${capitalize(id)}CollectionPage`, targetPage);
+        window.scrollTo(0, 0);
+      }
     };
 
-    return [
-      currentPage,
-      totalPageNumber,
-      pageRange,
-      { gotoNextPage, gotoPreviousPage, gotoThisPage },
-    ];
+    return [paginate, { gotoNextPage, gotoPreviousPage, gotoThisPage }];
   },
 };
 
 const collectionSorting = {
   observedAttributes: ['sort_by', 'sort_options'],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
+    const { capitalize } = helpers;
     const { sort_by: rawSortBy, sort_options: rawSortOptions } = element;
     const sortBy = rawSortBy;
     const sortOptions = JSON.parse(rawSortOptions || null);

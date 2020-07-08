@@ -1,22 +1,25 @@
-import { unsafeHTML } from 'lit-html/directives/unsafe-html';
-import { range } from '../../../helpers';
-
+/* eslint-disable no-unused-vars */
 export default {
-  demo: ({ html, hook }) => (element) => {
+  demo: ({ helpers, hook, settings, locales, shopify }) => (element) => {
+    const { html, unsafeHTML, range } = helpers;
     const [products, viewType] = hook(element);
     return html`<ul>
       <li>products: ${JSON.stringify(products)}</li>
       <li>view_type: ${JSON.stringify(viewType)}</li>
     </ul>`;
   },
-  'default-main': ({ html, hook, shopify, locales, settings }) => (element) => {
-    const [products, viewType] = hook(element);
+  'default-main': ({ helpers, hook, settings, locales, shopify }) => (
+    element
+  ) => {
+    const { html, unsafeHTML, range } = helpers;
+    const [products, viewType, collectionHandle] = hook(element);
     return html`
       ${products.length > 0
         ? html`
-            ${products.map((product) => {
+            ${products.map((product, index) => {
               return viewType === 'grid'
-                ? html`<main-collection-product-grid-item class="grid__item wide--one-fifth large--one-quarter medium-down--one-half" .product=${product}></main-collection-product-item>`
+                ? html`<main-collection-product-grid-item class="grid__item wide--one-fifth large--one-quarter medium-down--one-half" .product=${product} view_type="${viewType}" collection_handle="${collectionHandle}"
+                product_index="${index}"></main-collection-product-item>`
                 : html`<main-collection-product-list-item
                     .product=${product}
                   ></main-collection-product-list-item>`;

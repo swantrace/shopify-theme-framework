@@ -1,8 +1,12 @@
+/* eslint-disable no-self-assign */
+/* eslint-disable camelcase */
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
 import axios from 'axios';
 import localforage from 'localforage';
 import memoryDriver from 'localforage-memoryStorageDriver';
 import { setupCache } from 'axios-cache-adapter';
-import { handleize } from './helpers';
 
 export default async (config, shop) => {
   await localforage.defineDriver(memoryDriver);
@@ -28,6 +32,7 @@ export default async (config, shop) => {
   } = {}) {
     const fn = ({
       baseURL = null,
+      mlRootURL = '/',
       handle = null,
       blog_handle = null,
       current_tags = null,
@@ -89,6 +94,16 @@ export default async (config, shop) => {
         (data) => {
           if (typeof data === 'string') {
             try {
+              data = data
+                .replace('<!-- BEGIN template -->', '')
+                .replace('<!-- END template -->', '')
+                .replace('<!-- collection.theme -->', '')
+                .replace('<!-- product.theme -->', '')
+                .replace('<!-- search.theme -->', '')
+                .replace('<!-- page.theme -->', '')
+                .replace('<!-- cart.theme -->', '')
+                .replace('<!-- blog.theme -->', '')
+                .replace('<!-- article.theme -->', '');
               data = JSON.parse(data);
             } catch (err) {
               data = data;
@@ -98,6 +113,9 @@ export default async (config, shop) => {
         },
         ...transforms,
       ];
+      if (mlRootURL !== '/') {
+        realURL = `${mlRootURL}${realURL}`;
+      }
       return currentInstance({
         url: realURL,
         method,

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /**
  * @file include all the possible actions which can be triggered by website users
@@ -9,6 +10,7 @@ import {
   transformObject,
   capitalize,
   adjustCollectionPageURL,
+  analyzeCollectionPageURL,
 } from '../../helpers';
 /**
  *
@@ -47,11 +49,16 @@ const handleCollectionAjaxFail = (context, actionName) => (id) => (error) => {
 const collectionActionTemplate = (actionName, collectionPropertyName) => (
   id,
   apis,
-  transformFns
+  transformFns,
+  shopify
 ) => (context, payload) => {
+  const {
+    canonicalURL,
+    requestLocale: { rootURL: mlRootURL },
+  } = shopify;
   let params;
   let tmp1 = context.state[`${id}Collection`];
-  tmp1 = { ...tmp1, [collectionPropertyName]: payload };
+  tmp1 = { ...tmp1, page: 1, [collectionPropertyName]: payload };
   context.commit(
     actionName.replace('[id]', capitalize(id)).replace('change', 'set'),
     payload
@@ -87,6 +94,7 @@ const collectionActionTemplate = (actionName, collectionPropertyName) => (
   }
   apis
     .getCollection({
+      mlRootURL,
       view: 'theme',
       handle: tmp1.handle,
       params,
@@ -110,6 +118,7 @@ const collectionActionTemplate = (actionName, collectionPropertyName) => (
           (productHandle, callback) => {
             apis
               .getProduct({
+                mlRootURL,
                 view: 'theme',
                 handle: productHandle,
               })
@@ -184,11 +193,14 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
   const { is_main, page, title, sort_by } = payload;
   let { handle, current_tags } = payload;
   let params;
-  const { canonicalURL } = shopify;
+  const {
+    canonicalURL,
+    requestLocale: { rootURL: mlRootURL },
+  } = shopify;
   const tmp1 = context.state[`${id}Collection`];
   if (is_main) {
     context.commit(`set${capitalize(id)}CollectionIsMain`, true);
-    [, , handle, current_tags] = new URL(canonicalURL).pathname.split('/');
+    [handle, current_tags] = analyzeCollectionPageURL(canonicalURL, mlRootURL);
     tmp1.handle = handle;
     tmp1.current_tags = current_tags;
     const search_params = new URL(canonicalURL).searchParams;
@@ -256,6 +268,7 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
   }
   apis
     .getCollection({
+      mlRootURL,
       view: 'theme',
       handle: tmp1.handle,
       params,
@@ -280,6 +293,7 @@ export const initiateCollection = (id, apis, transformFns, shopify) => (
           (productHandle, callback) => {
             apis
               .getProduct({
+                mlRootURL,
                 view: 'theme',
                 handle: productHandle,
               })

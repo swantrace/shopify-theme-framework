@@ -4,6 +4,7 @@ import collectionProductListItem from './collectionProductListItem';
 import collectionTags from './collectionTags';
 import collectionPagination from './collectionPagination';
 import collectionSorting from './collectionSorting';
+import collectionBreadcrumb from './collectionBreadcrumb';
 
 export default {
   'collection-products-list': collectionProductsList,
@@ -12,4 +13,5 @@ export default {
   'collection-tags': collectionTags,
   'collection-pagination': collectionPagination,
   'collection-sorting': collectionSorting,
+  'collection-breadcrumb': collectionBreadcrumb,
 };

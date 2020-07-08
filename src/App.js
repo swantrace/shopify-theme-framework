@@ -1,17 +1,32 @@
-import { html, component } from 'haunted';
 import ajaxAPIsCreator from './ajax';
 import Store from './Store';
 import helpers from './helpers';
+import 'lazysizes';
+import 'lazysizes/plugins/rias/ls.rias';
+import 'lazysizes/plugins/bgset/ls.bgset';
+import 'lazysizes/plugins/object-fit/ls.object-fit';
+import 'lazysizes/plugins/parent-fit/ls.parent-fit';
+import 'lazysizes/plugins/respimg/ls.respimg';
 
 import {
   CartCustomElementGroup,
   CollectionCustomElementGroup,
   ProductCustomElementGroup,
+  SearchCustomElementGroup,
+  PublicCustomElementGroup,
+  PasswordCustomElementGroup,
+  PageCustomElementGroup,
+  ListCollectionElementGroup,
+  IndexCustomElement,
+  CustomerCustomElement,
+  BlogCustomElementGroup,
+  ArticleCustomElementGroup,
+  FourZeroFourCustomElementGroup,
 } from './types';
 
 export default class App {
   constructor({
-    customElementGroupTypeClassArray = [],
+    customElementGroupTypeClasses = [],
     customElementGroupDefinitions = [],
     config = {},
     shopify = {},
@@ -20,71 +35,63 @@ export default class App {
     locales = {},
   } = {}) {
     if (!App.instance) {
-      this.customElementGroupTypeClassArray = customElementGroupTypeClassArray;
+      this.customElementGroupTypeClasses = customElementGroupTypeClasses;
       this.customElementGroupDefinitions = customElementGroupDefinitions;
       this.config = config;
       this.shopify = shopify;
-      this.helpers = helpers;
       this.settings = settings;
       this.locales = locales;
-      this.customElementGroupTypeList = {};
-      this.customElementGroups = {};
       this.transformFns = {
         cart: transformFns && transformFns.cart ? transformFns.cart : [],
         collection:
           transformFns && transformFns.collection
             ? [
                 ...transformFns.collection,
-                (collection) => {
-                  return {
-                    ...collection,
-                    all_tags: collection.all_tags.map((tag) => {
-                      return {
-                        label: tag,
-                        handle: this.helpers.handleize(tag),
-                      };
-                    }),
-                    current_tags: (collection.current_tags || []).reduce(
-                      (acc, cur, idx) => {
-                        let current = acc;
-                        if (idx > 0) {
-                          current += '+';
-                        }
-                        current += this.helpers.handleize(cur);
-                        return current;
-                      },
-                      ''
-                    ),
-                  };
-                },
+                (collection) => ({
+                  ...collection,
+                  all_tags: this.helpers.handliezeTags(collection.all_tags),
+                  tags: this.helpers.handliezeTags(collection.tags),
+                  current_tags: this.helpers.concatTags(
+                    collection.current_tags
+                  ),
+                }),
               ]
             : [
-                (collection) => {
-                  return {
-                    ...collection,
-                    all_tags: collection.all_tags.map((tag) => {
-                      return {
-                        label: tag,
-                        handle: this.helpers.handleize(tag),
-                      };
-                    }),
-                    current_tags: (collection.current_tags || []).reduce(
-                      (acc, cur, idx) => {
-                        let current = acc;
-                        if (idx > 0) {
-                          current += '+';
-                        }
-                        current += this.helpers.handleize(cur);
-                        return current;
-                      },
-                      ''
-                    ),
-                  };
-                },
+                (collection) => ({
+                  ...collection,
+                  all_tags: this.helpers.handliezeTags(collection.all_tags),
+                  tags: this.helpers.handliezeTags(collection.tags),
+                  current_tags: this.helpers.concatTags(
+                    collection.current_tags
+                  ),
+                }),
               ],
         product:
           transformFns && transformFns.product ? transformFns.product : [],
+        blog:
+          transformFns && transformFns.blog
+            ? [
+                ...transformFns.blog,
+                (blog) => ({
+                  ...blog,
+                  all_tags: this.helpers.handliezeTags(blog.all_tags),
+                  tags: this.helpers.handliezeTags(blog.tags),
+                  current_tags: this.helpers.concatTags(blog.current_tags),
+                }),
+              ]
+            : [
+                (blog) => ({
+                  ...blog,
+                  all_tags: this.helpers.handliezeTags(blog.all_tags),
+                  tags: this.helpers.handliezeTags(blog.tags),
+                  current_tags: this.helpers.concatTags(blog.current_tags),
+                }),
+              ],
       };
+      this.customElementGroupTypeList = {};
+      this.customElementGroups = {};
+      this.helpers = helpers;
+      this.components = {};
 
       App.instance = this;
     }
@@ -107,24 +114,40 @@ export default class App {
     return this.customElementGroupTypeList[type];
   }
 
-  register(type, id, tagDefinitions, apis, transformFns, shopify) {
-    return this.getType(type)(id, tagDefinitions, apis, transformFns, shopify);
+  register(type, id, tagDefinitions, apis, transformFns, shopify, helperFns) {
+    return this.getType(type)(
+      id,
+      tagDefinitions,
+      apis,
+      transformFns,
+      shopify,
+      helperFns
+    );
   }
 
   static async init(...args) {
     const app = new App(...args);
     app.apis = await ajaxAPIsCreator(app.config, app.shopify);
-
-    app.addTypes(
-      Object.assign(
-        {
-          cart: CartCustomElementGroup,
-          collection: CollectionCustomElementGroup,
-          product: ProductCustomElementGroup,
-        },
-        ...app.customElementGroupTypeClassArray
-      )
+    app.customElementGroupTypeClasses = Object.assign(
+      {
+        cart: CartCustomElementGroup,
+        collection: CollectionCustomElementGroup,
+        product: ProductCustomElementGroup,
+        fourZeroFour: FourZeroFourCustomElementGroup,
+        search: SearchCustomElementGroup,
+        public: PublicCustomElementGroup,
+        password: PasswordCustomElementGroup,
+        page: PageCustomElementGroup,
+        listCollection: ListCollectionElementGroup,
+        index: IndexCustomElement,
+        customer: CustomerCustomElement,
+        blog: BlogCustomElementGroup,
+        article: ArticleCustomElementGroup,
+      },
+      ...app.customElementGroupTypeClasses
     );
+
+    app.addTypes(app.customElementGroupTypeClasses);
 
     app.customElementGroupDefinitions.forEach(
       ({ type, id, tagDefinitions }) => {
@@ -134,7 +157,8 @@ export default class App {
           tagDefinitions,
           app.apis,
           app.transformFns,
-          app.shopify
+          app.shopify,
+          app.helpers
         );
         app.customElementGroups = {
           ...app.customElementGroups,
@@ -183,29 +207,31 @@ export default class App {
 
     Object.keys(app.customElementGroups).forEach((idandType) => {
       const { tags } = app.customElementGroups[idandType];
+
       tags.forEach(({ definition, hook, observedAttributes, tagname }) => {
         const Component = definition({
-          html,
-          hook: hook(app.store, app.apis, app.helpers),
-          store: app.store,
-          apis: app.apis,
+          helpers,
+          hook: hook(app.store),
           settings: app.settings,
           locales: app.locales,
           shopify: app.shopify,
         });
 
-        customElements.define(
-          tagname,
-          component(Component, {
-            observedAttributes,
-            useShadowDOM: false,
-          })
-        );
+        const currentComponent = app.helpers.component(Component, {
+          observedAttributes,
+          useShadowDOM: false,
+        });
+
+        customElements.define(tagname, currentComponent);
+        app.components[tagname] = currentComponent;
       });
     });
 
     window.app = app;
-
+    document.documentElement.className = document.documentElement.className.replace(
+      'no-js',
+      'supports-js'
+    );
     return app;
   }
 }

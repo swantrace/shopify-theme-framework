@@ -1,0 +1,15 @@
+export default Object.freeze({
+  all_tags: [],
+  tags: [],
+  current_tags: '',
+  articles: [],
+  articles_count: 0,
+  handle: '',
+  id: null,
+  is_main: false,
+  page: 1,
+  next_article: null,
+  previous_article: null,
+  title: '',
+  view_type: 'list',
+});

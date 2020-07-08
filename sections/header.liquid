@@ -112,7 +112,9 @@
           <div class="header-bar__module">
             <a href="{{ routes.cart_url }}" class="cart-page-link">
               {{ 'layout.cart.title' | t }}{% unless cart.item_count == 0 %}:{% endunless %}
-              <span class="cart-count header-bar__cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">{{ cart.item_count }}</span>
+              <span class="cart-count header-bar__cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">
+                {{ cart.item_count }}
+              </span>
             </a>
           </div>
 
@@ -142,17 +144,28 @@
 
     <div class="wrapper post-large--hide">
       {% unless section.settings.nav_menu == blank and section.settings.header_search_enable == false and shop.customer_accounts_enabled == false %}
-        <button type="button" class="mobile-nav-trigger" id="MobileNavTrigger" aria-controls="MobileNav" aria-expanded="false">
+        <button type="button" 
+                class="mobile-nav-trigger" 
+                id="MobileNavTrigger" 
+                aria-controls="MobileNav" 
+                aria-expanded="false">
           <span class="icon icon-hamburger" aria-hidden="true"></span>
           {{ 'layout.navigation.menu' | t }}
         </button>
       {% endunless %}
-      <a href="{{ routes.cart_url }}" class="cart-page-link mobile-cart-page-link">
+      <a href="{{ routes.cart_url }}" 
+        class="cart-page-link mobile-cart-page-link"
+      >
         <span class="icon icon-cart header-bar__cart-icon" aria-hidden="true"></span>
-        {{ 'layout.cart.title' | t }} <span class="cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">{{ cart.item_count }}</span>
+        {{ 'layout.cart.title' | t }} 
+        <span class="cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">
+          {{ cart.item_count }}
+        </span>
       </a>
     </div>
+
     {% include 'mobile-nav' with linklists[section.settings.nav_menu] %}
+
   </div>
 
   <header class="site-header" role="banner">
@@ -187,7 +200,9 @@
                   </a>
                 </div>
               {% else %}
-                <a href="{{ routes.root_url }}" itemprop="url">{{ shop.name }}</a>
+                <a href="{{ routes.root_url }}" itemprop="url">
+                  {{ shop.name }}
+                </a>
               {% endif %}
             {% if request.page_type == 'index' %}
               </h1>
@@ -217,7 +232,11 @@
                   </div>
                 </noscript>
                 <div class="logo__image-wrapper supports-js">
-                  <a href="{{ routes.root_url }}" itemprop="url" style="padding-top:{{ 1 | divided_by: section.settings.logo.aspect_ratio | times: 100}}%;">
+                  <a 
+                    href="{{ routes.root_url }}" 
+                    itemprop="url" 
+                    style="padding-top:{{ 1 | divided_by: section.settings.logo.aspect_ratio | times: 100}}%;"
+                  >
                     {% assign img_url = section.settings.logo | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
                     <img class="logo__image lazyload"
                          src="{{ section.settings.logo | img_url: '300x300' }}"
@@ -230,7 +249,9 @@
                   </a>
                 </div>
               {% else %}
-                <a href="{{ routes.root_url }}" itemprop="url">{{ shop.name }}</a>
+                <a href="{{ routes.root_url }}" itemprop="url">
+                  {{ shop.name }}
+                </a>
               {% endif %}
             {% if request.page_type == 'index' %}
               </h1>
@@ -247,7 +268,11 @@
     </div>
   </header>
 </div>
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['header'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

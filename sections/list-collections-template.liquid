@@ -57,6 +57,11 @@
   {% endif %}
 </div>
 
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-list-collections'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

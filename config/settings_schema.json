@@ -2453,5 +2453,45 @@
         ]
       }
     ]
+  },
+  {
+    "name": {
+      "en": "Number of items"
+    },
+    "settings": [
+      {
+        "type": "range",
+        "id": "number_of_items_collection",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "default": 20,
+        "label": {
+          "en": "products on collection pages"
+        }
+      },
+      {
+        "type": "range",
+        "id": "number_of_items_search",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "default": 20,
+        "label": {
+          "en": "items on the search result page"
+        }
+      },
+      {
+        "type": "range",
+        "id": "number_of_items_blog",
+        "min": 10,
+        "max": 50,
+        "step": 1,
+        "default": 20,
+        "label": {
+          "en": "articles on blog pages"
+        }
+      }
+    ]
   }
 ]

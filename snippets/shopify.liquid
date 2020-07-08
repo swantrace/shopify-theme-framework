@@ -3,6 +3,33 @@
   canonicalURL: {{ canonical_url | json }},
   template: {{ template.name | json }},
   shopProductsCount: {{ shop.products_count }},
+  moneyFormat: {{ shop.money_format | json }},
+  requestHost: {{ request.host | json }},
+  requestLocale: {
+    endonymName: {{ request.locale.endonym_name | json }},
+    isoCode: {{ request.locale.iso_code | json }},
+    name: {{ request.locale.name | json }},
+    primary: {{ request.locale.name | json }},
+    rootURL: {{ request.locale.root_url | json }}
+  },
+  requestPath: {{ request.path | json }},
+  requestPageType: {{ request.page_type | json }},
+  routes: {
+    rootURL: {{ routes.root_url | json }},
+    accountURL: {{ routes.account_url | json }},
+    accountLoginURL: {{ routes.account_login_url | json }},
+    accountLogoutURL: {{ routes.account_logout_url | json }},
+    accountRegisterURL: {{ routes.account_register_url | json }},
+    accountAddressesURL: {{ routes.account_addresses_url | json }},
+    collectionsURL: {{ routes.collections_url | json }},
+    allProductsCollectionURL: {{ routes.all_products_collection_url | json }},
+    searchURL: {{ routes.search_url | json }},
+    cartURL: {{ routes.cart_url | json }},
+    cartAddURL: {{ routes.cart_add_url | json }},
+    cartChangeURL: {{ routes.cart_change_url | json }},
+    cartClearURL: {{ routes.cart_clear_url | json }},
+    productRecommendationsURL: {{ routes.product_recommendations_url | json }}
+  },
   placeHolders: {
     image: `{{ 'image' | placeholder_svg_tag }}`,
     "collection-1": `{{ 'collection-1' | placeholder_svg_tag }}`,

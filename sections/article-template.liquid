@@ -164,6 +164,11 @@
 
 {% endpaginate %}
 
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-article'] = {{ section.settings | json }};
+</script>
 
 
 {% schema %}

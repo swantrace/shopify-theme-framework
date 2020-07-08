@@ -11,7 +11,11 @@
   {% endif %}
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['rich-text'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

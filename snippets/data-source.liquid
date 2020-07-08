@@ -22,17 +22,19 @@
 {% when 'blog' %}
 {% capture blog_json %}{{l}}
 "all_tags": [{% for tag in blog.all_tags %}"{{ tag }}"{% unless forloop.last %}, {% endunless %}{% endfor %}],
-"articles": {{ blog.articles | json }},
-"articles_count": {{ blog.articles_count| json }},
-"comments_enabled": {{ blog.comments_enabled?| json }},
-"handle": {{ blog.handle| json }},
-"id": {{ blog.id| json }},
-"moderated": {{ blog.moderated?| json }},
-"next_article": {{ blog.next_article| json }},
+"articles": [{% paginate blog.articles by settings.number_of_items_blog %}{% for article in blog.articles %}{{ article | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+"paginate": {% paginate blog.articles by settings.number_of_items_blog %}{{ paginate | json }}{% endpaginate %},
+"articles_count": {{ blog.articles_count | json }},
+"comments_enabled": {{ blog.comments_enabled? | json }},
+"handle": {{ blog.handle | json }},
+"id": {{ blog.id | json }},
+"moderated": {{ blog.moderated? | json }},
+"next_article": {{ blog.next_article | json }},
 "previous_article": {{ blog.previous_article| json }},
 "tags": [{% for tag in blog.tags %}"{{ tag }}"{% unless forloop.last %}, {% endunless %}{% endfor %}],
 "title": {{ blog.title| json }},
-"url": {{ blog.url| json }}
+"url": {{ blog.url| json }},
+"current_tags": {{ current_tags | json }}
 {{r}}{% endcapture%}
 {{ blog_json }}
 {% when 'collection' %}
@@ -64,7 +66,8 @@
 "default_sort_by": {{ collection.default_sort_by | json }},
 "description":{{ collection.description | json }},
 "image":{{ collection.image | json }},
-"products_handles": [{% paginate collection.products by 50 %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+"products_handles": [{% paginate collection.products by settings.number_of_items_collection %}{% for product in collection.products %}{{ product.handle | json }}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+"paginate": {% paginate collection.products by settings.number_of_items_collection %}{{ paginate | json }}{% endpaginate %}, 
 "products_count": {{ collection.products_count | json }},
 "tags": {{ collection.tags | json }},
 "page": {{ current_page | default: 1 }},
@@ -107,6 +110,15 @@
 "options_with_values": {{ product.options_with_values | json }},
 "template_suffix": {{ product.template_suffix | json }},
 "url": {{ product.url | json }},
+"featured_image": {{l}}
+  "existed": {{ product.featured_image != blank | json }},
+	"src": {% if product.featured_image == blank %}{{ product.featured_image.src | img_url: 'large' | json }}{% else %}{{ product.featured_image | img_url: '1x1' | json }}{% endif %},
+	"alt": {{ product.featured_image.alt | escape | json }},
+	"id": {{ product.featured_image.id | json }},
+	"aspect_ratio": {{ product.featured_image.aspect_ratio | json }},
+	"height": {{ product.featured_image.height | json }},
+	"width": {{ product.featured_image.width | json }}
+{{r}},
 "variants": [
 {% for variant in product.variants %}
 {% assign variant_json = variant | json %}
@@ -118,8 +130,8 @@
 "incoming": {{ variant.incoming | json }},
 "next_incoming_date": {{ variant.next_incoming_date | json }},
 "selected": {{ variant.selected | json }},
-"variant.unit_price": {{ variant.unit_price | json }},
-"variant.unit_price_measurement": {{ variant.unit_price_measurement | json }},
+"unit_price": {{ variant.unit_price | json }},
+"unit_price_measurement": {{ variant.unit_price_measurement | json }},
 "url": {{ variant.url | json }},
 "weight_unit": {{ variant.weight_unit | json }},
 "weight_in_unit": {{ variant.weight_in_unit | json }}
@@ -138,7 +150,7 @@
 {% when 'search' %}
 {% capture search_json %}{{l}}
 "search_performed":{{ search.performed | json }},
-"search_results": [{% paginate search.results by 20 %}{% for item in search.results %}{% if item.object_type != 'page' %}{{ item  | json }}{% else %}{{l}}"title": {{ item.title | json }}, "content": {{ item.content | json }}, "handle": {{ item.handle | json }}, "url": {{ item.url | json }}, "published_at": {{ item.published_at | date: '%FT%T%:z' | json }}{{r}}{% endif %}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
+"search_results": [{% paginate search.results by settings.number_of_items_search %}{% for item in search.results %}{% if item.object_type != 'page' %}{{ item  | json }}{% else %}{{l}}"title": {{ item.title | json }}, "content": {{ item.content | json }}, "handle": {{ item.handle | json }}, "url": {{ item.url | json }}, "published_at": {{ item.published_at | date: '%FT%T%:z' | json }}{{r}}{% endif %}{% unless forloop.last %}, {% endunless %}{% endfor %}{% endpaginate %}],
 "results_count":{{ search.results_count | json }},
 "search_terms":{{ search.terms | json }},
 "search_types":{{ search.types | json }}

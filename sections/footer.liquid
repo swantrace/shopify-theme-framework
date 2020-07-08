@@ -142,6 +142,11 @@
 
 </footer>
 
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['footer'] = {{ section.settings | json }};
+</script>
 
 
 {% schema %}

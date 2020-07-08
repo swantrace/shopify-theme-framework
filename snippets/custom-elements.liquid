@@ -7,23 +7,15 @@
       'collection-pagination': 'default-main',
       'collection-sorting': 'default-main',
       'collection-products-list': 'default-main',
-      'collection-product-grid-item': ({html, hook}) => ({product}) => {
-        return html`{% render 'main-collection-product-grid-item' %}`;
-      },
-      'collection-product-list-item': ({html, hook}) => ({product}) => {
-        return html`{% render 'main-collection-product-list-item' %}`;
-      },
+      'collection-product-grid-item': 'default-main',
+      'collection-product-list-item': 'default-main',
     }, 
   }, 
   { 
-    type: 'collection', 
-    id: 'side',
+    type: 'fourZeroFour', 
+    id: 'main',
     tagDefinitions: { 
-      'collection-tags': 'test', 
-      'collection-pagination': 'test',
-      'collection-products-list': 'test',
-      'collection-product-grid-item': 'test',
-      'collection-product-list-item': 'test'
+      'fourzerofour-page-content': 'default-main', 
     }, 
   }, 
 ]

@@ -198,7 +198,11 @@
   </script>
 {% endunless %}
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['featured-product'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

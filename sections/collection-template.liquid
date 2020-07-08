@@ -25,7 +25,11 @@
     </div>
     <hr class="hr--clear hr--small">
   {% endif %}
-  <main-collection-products-list is_main class="grid-uniform grid-link__container"></main-collection-products-list>
+  <main-collection-products-list 
+    is_main 
+    handle="{{collection.handle}}" 
+    class="grid-uniform grid-link__container"
+  ></main-collection-products-list>
   <main-collection-pagination></main-collection-pagination>
 </div>
 <script>

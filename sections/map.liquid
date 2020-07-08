@@ -60,7 +60,11 @@
   </div>
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['map'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

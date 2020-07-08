@@ -34,7 +34,15 @@
   </div>
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['collection-list'] = {{ section.settings | json }};
+  theme.settings['collection-list'].blocks = [{% for block in section.blocks %}{
+    settings: {{ block.settings | json }},
+    shopify_attributes: {{ block.shopify_attributes | json }}
+  },{% endfor %}]
+</script>
 
 {% schema %}
 {

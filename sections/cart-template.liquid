@@ -7,7 +7,11 @@
   <cart-form cart-form cart_json="{{ cart | json | escape }}"></cart-form>
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-cart'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

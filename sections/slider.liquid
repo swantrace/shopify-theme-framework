@@ -188,7 +188,11 @@
   </div>
 {%- endif -%}
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['slider'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

@@ -87,7 +87,11 @@
 
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['featured-blog'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

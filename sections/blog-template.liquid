@@ -95,7 +95,11 @@
 
 {% endpaginate %}
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-blog'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

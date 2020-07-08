@@ -23,6 +23,11 @@
   </div>
 </div>
 
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['featured-video'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

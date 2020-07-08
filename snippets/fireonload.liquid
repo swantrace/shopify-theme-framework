@@ -6,7 +6,7 @@
       customElementGroupDefinitions: {% render 'custom-elements'%},
       transformFns: {% render 'transform-fns'%},
       settings: theme.settings,
-      locales: theme.locales,
+      locales: { ...theme.locales, currentLanguage: {{ request.locale.iso_code | json }} },
     })
     .then(app => {
       {% render 'global-callback' %}

@@ -263,6 +263,12 @@
   </script>
 {% endunless %}
 
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['main-product'] = {{ section.settings | json }};
+</script>
+
 {% schema %}
 {
   "name": {

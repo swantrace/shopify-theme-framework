@@ -1,3 +1,5 @@
 ${products.map(product => {
-  return view_type == 'grid' ? html`<main-collection-product-grid-item style="max-width: 25%" .product=${product}></main-collection-product-item>` : html`<main-collection-product-list-item .product=${product}></main-collection-product-list-item>`
+  return viewType == 'grid' ? 
+  `<main-collection-product-grid-item style="max-width: 25%" product='${product}'></main-collection-product-item>` 
+  : `<main-collection-product-list-item product='${product}''></main-collection-product-list-item>`
 })}

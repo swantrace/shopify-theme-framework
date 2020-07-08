@@ -57,7 +57,11 @@
   </div>
 </div>
 
-
+<script>
+  window.theme = window.theme || {};
+  theme.settings = theme.settings || {};
+  theme.settings['featured-collection'] = {{ section.settings | json }};
+</script>
 
 {% schema %}
 {

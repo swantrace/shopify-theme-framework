@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 const fourZeroFourPageContent = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };

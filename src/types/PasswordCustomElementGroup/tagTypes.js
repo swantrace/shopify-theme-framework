@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const passwordLoginModal = {
   observedAttributes: [],
   hook: (id) => (store) => (element) => {

@@ -111,7 +111,9 @@ const collectionTags = {
 
 const collectionBreadcrumb = {
   observedAttributes: ['current_tags'],
-  hook: (id, helpers) => (store) => (element) => {},
+  hook: (id, helpers) => (store) => (element) => {
+    return [];
+  },
 };
 
 const collectionPagination = {
@@ -181,4 +183,5 @@ export default {
   'collection-tags': collectionTags,
   'collection-pagination': collectionPagination,
   'collection-sorting': collectionSorting,
+  'collection-breadcrumb': collectionBreadcrumb,
 };

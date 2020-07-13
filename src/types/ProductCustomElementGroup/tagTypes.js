@@ -1,42 +1,42 @@
 /* eslint-disable no-unused-vars */
 const productAddtocartForm = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const productMeta = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const productDescription = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const productImages = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const productRecommendations = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const productBreadcrumb = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };

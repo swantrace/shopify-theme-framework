@@ -1,42 +1,42 @@
 /* eslint-disable no-unused-vars */
 const searchIntro = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const searchBar = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const searchItemsList = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const searchListItem = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const searchGridItem = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const searchPagination = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };

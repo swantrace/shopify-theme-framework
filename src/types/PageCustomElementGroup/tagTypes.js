@@ -1,21 +1,21 @@
 /* eslint-disable no-unused-vars */
 const pageTitle = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const pageContent = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const pageContactForm = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };

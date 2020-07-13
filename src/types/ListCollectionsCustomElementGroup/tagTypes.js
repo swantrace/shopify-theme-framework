@@ -1,28 +1,28 @@
 /* eslint-disable no-unused-vars */
 const collectionsList = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const collectionsListItem = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const collectionsListBreadcrumb = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };
 
 const collectionsListPagination = {
   observedAttributes: [],
-  hook: (id) => (store) => (element) => {
+  hook: (id, helpers) => (store) => (element) => {
     return [];
   },
 };

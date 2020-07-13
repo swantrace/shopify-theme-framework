@@ -8,12 +8,12 @@
 {% capture other_data %}
 "comments": {{ article.comments | json }},
 "comments_count": {{article.comments_count | json }},
-"comments_enabled": {{article.comments_enabled | json }},
+"comments_enabled": {{article.comments_enabled? | json }},
 "comment_post_url": {{article.comment_post_url | json }},
 "excerpt": {{article.excerpt | json }},
 "image": {{article.image | json }},
 "image_alt": {{article.image.alt | json }},
-"moderated": {{article.moderated | json }},
+"moderated": {{article.moderated? | json }},
 "url": {{article.url | json }},
 "user": {{article.user | json }}
 {% endcapture %}
@@ -156,92 +156,139 @@
 "search_types":{{ search.types | json }}
 {{r}}{% endcapture %}
 {{ search_json }}
-{% when 'order' %}
-{% capture order_json %}{{l}}
-"attributes": {{ order.attributes | json }},
-"billing_address": {{ order.billing_address | json }},
-"cancelled": {{ order.cancelled | json }},
-"cancelled_at": {{ order.cancelled_at | json }},
-"cancel_reason": {{ order.cancel_reason | json }},
-"cancel_reason_label": {{ order.cancel_reason_label | json }},
-"created_at": {{ order.created_at | date: '%FT%T%:z' | json }},
-"customer": {{ order.customer | json }},
-"customer_url": {{ order.customer_url | json }},
-"discount_applications": {{ order.discount_applications | json }},
-"email": {{ order.email | json }},
-"financial_status": {{ order.financial_status | json }},
-"financial_status_label": {{ order.financial_status_label | json }},
-"fulfillment_status": {{ order.fulfillment_status | json }},
-"fulfillment_status_label": {{ order.fulfillment_status_label | json }},
-"line_items": {{ order.line_items | json }},
-"location": {{ order.location | json }},
-"name": {{ order.name | json }},
-"note": {{ order.note | json }},
-"order_number": {{ order.order_number | json }},
-"order_status_url": {{ order.order_status_url | json }},
-"phone": {{ order.phone | json }},
-"shipping_address": {{ order.shipping_address | json }},
-"shipping_methods": {{ order.shipping_methods | json }},
-"shipping_price": {{ order.shipping_price | json }},
-"subtotal_price": {{ order.subtotal_price | json }},
-"tags": {{ order.tags | json }},
-"tax_lines": {{ order.tax_lines | json }},
-"tax_price": {{ order.tax_price | json }},
-"total_discounts": {{ order.total_discounts | json }},
-"total_price": {{ order.total_price | json }},
-"transactions": {{ order.transactions | json }}
+{% when 'account' %}
+{% capture customer_json %}{{l}}
+	"accept_marketing": {{ customer.accept_marketing | json }},
+  "addresses": {{ customer.addresses | json }},
+  "addresses_count": {{ customer.addresses_count | json }},
+  "default_address": {{ customer.default_address | json }},
+  "email": {{ customer.email | json }},
+  "first_name": {{ customer.first_name | json }},
+  "has_account": {{ customer.has_account | json }},
+  "id": {{ customer.id | json }},
+  "last_name": {{ customer.last_name | json }},
+  "last_order": {
+    "attributes": {{ customer.last_order.attributes | json }},
+    "billing_address": {{ customer.last_order.billing_address | json }},
+    "cancelled": {{ customer.last_order.cancelled | json }},
+    "cancelled_at": {{ customer.last_order.cancelled_at | json }},
+    "cancel_reason": {{ customer.last_order.cancel_reason | json }},
+    "cart_level_discount_applications": {{ customer.last_order.cart_level_discount_applications | json }},
+    "created_at": "{{ customer.last_order.created_at }}",
+    "customer_url": {{ customer.last_order.customer_url | json }},
+    "discount_applications": {{ customer.last_order.discount_applications | json }},
+    "email": {{ customer.last_order.email | json }},
+    "financial_status": {{ customer.last_order.financial_status | json }},
+    "financial_status_label": {{ customer.last_order.financial_status_label | json }},
+    "fulfillment_status": {{ customer.last_order.fulfillment_status | json }},
+    "fulfillment_status_label": {{ customer.last_order.fulfillment_status_label | json }},
+    "line_items": {{ customer.last_order.line_items | json }},
+    "line_items_subtotal_price": {{ customer.last_order.line_items_subtotal_price | json }},
+    "location": {{ customer.last_order.location | json }},
+    "name": {{ customer.last_order.name | json }},
+    "note": {{ customer.last_order.note | json }},
+    "order_number": {{ customer.last_order.order_number | json }},
+    "order_status_url": {{ customer.last_order.order_status_url | json }},
+    "phone": {{ customer.last_order.phone | json }},
+    "shipping_address": {{ customer.last_order.shipping_address | json }},
+    "shipping_methods": {{ customer.last_order.shipping_methods | json }},
+    "shipping_price": {{ customer.last_order.shipping_price | json }},
+    "subtotal_price": {{ customer.last_order.subtotal_price | json }},
+    "tags": {{ customer.last_order.tags | json }},
+    "tax_lines": [
+        {% for tax_line in customer.last_order.tax_lines %}{
+          "price": {{ tax_line.price | json }},
+          "rate": {{ tax_line.rate | json }},
+          "rate_percentage": {{ tax_line.rate_percentage | json }},
+          "title": {{ tax_line.title | json }}
+        }{% unless forloop.last %},{% endunless %}{% endfor %}
+    ],
+    "tax_price": {{ customer.last_order.tax_price | json }},
+    "total_discounts": {{ customer.last_order.total_discounts | json }},
+    "total_net_amount": {{ customer.last_order.total_net_amount | json }},
+    "total_price": {{ customer.last_order.total_price | json }},
+    "total_refunded_amount": {{ customer.last_order.total_refunded_amount | json }},
+    "transactions": [
+      {% for transaction in customer.last_order.transactions %}{
+        "amount": {{ transaction.amount | json }},
+        "created_at": "{{ transaction.created_at }}",
+        "gateway": {{ transaction.gateway | json }},
+        "id": {{ transaction.id | json }},
+        "kind": {{ transaction.kind | json }},
+        "name": {{ transaction.name | json }},
+        "payment_details": {{ transaction.payment_details | json }},
+        "receipt": {{ transaction.receipt | json }},
+        "status": {{ transaction.status | json }},
+        "status_label": {{ transaction.status_label | json }}
+      }{% unless forloop.last %},{% endunless %}{% endfor %}
+    ]
+  },
+  "name": {{ customer.name | json }},
+  "orders": [{% paginate customer.orders by settings.number_of_orders_account %}{% for order in customer.orders %}
+		{
+			"attributes": {{ customer.last_order.attributes | json }},
+			"billing_address": {{ customer.last_order.billing_address | json }},
+			"cancelled": {{ customer.last_order.cancelled | json }},
+			"cancelled_at": {{ customer.last_order.cancelled_at | json }},
+			"cancel_reason": {{ customer.last_order.cancel_reason | json }},
+			"cart_level_discount_applications": {{ customer.last_order.cart_level_discount_applications | json }},
+			"created_at": "{{ customer.last_order.created_at }}",
+			"customer_url": {{ customer.last_order.customer_url | json }},
+			"discount_applications": {{ customer.last_order.discount_applications | json }},
+			"email": {{ customer.last_order.email | json }},
+			"financial_status": {{ customer.last_order.financial_status | json }},
+			"financial_status_label": {{ customer.last_order.financial_status_label | json }},
+			"fulfillment_status": {{ customer.last_order.fulfillment_status | json }},
+			"fulfillment_status_label": {{ customer.last_order.fulfillment_status_label | json }},
+			"line_items": {{ customer.last_order.line_items | json }},
+			"line_items_subtotal_price": {{ customer.last_order.line_items_subtotal_price | json }},
+			"location": {{ customer.last_order.location | json }},
+			"name": {{ customer.last_order.name | json }},
+			"note": {{ customer.last_order.note | json }},
+			"order_number": {{ customer.last_order.order_number | json }},
+			"order_status_url": {{ customer.last_order.order_status_url | json }},
+			"phone": {{ customer.last_order.phone | json }},
+			"shipping_address": {{ customer.last_order.shipping_address | json }},
+			"shipping_methods": {{ customer.last_order.shipping_methods | json }},
+			"shipping_price": {{ customer.last_order.shipping_price | json }},
+			"subtotal_price": {{ customer.last_order.subtotal_price | json }},
+			"tags": {{ customer.last_order.tags | json }},
+			"tax_lines": [
+					{% for tax_line in customer.last_order.tax_lines %}{
+						"price": {{ tax_line.price | json }},
+						"rate": {{ tax_line.rate | json }},
+						"rate_percentage": {{ tax_line.rate_percentage | json }},
+						"title": {{ tax_line.title | json }}
+					}{% unless forloop.last %},{% endunless %}{% endfor %}
+			],
+			"tax_price": {{ customer.last_order.tax_price | json }},
+			"total_discounts": {{ customer.last_order.total_discounts | json }},
+			"total_net_amount": {{ customer.last_order.total_net_amount | json }},
+			"total_price": {{ customer.last_order.total_price | json }},
+			"total_refunded_amount": {{ customer.last_order.total_refunded_amount | json }},
+			"transactions": [
+				{% for transaction in customer.last_order.transactions %}{
+					"amount": {{ transaction.amount | json }},
+					"created_at": "{{ transaction.created_at }}",
+					"gateway": {{ transaction.gateway | json }},
+					"id": {{ transaction.id | json }},
+					"kind": {{ transaction.kind | json }},
+					"name": {{ transaction.name | json }},
+					"payment_details": {{ transaction.payment_details | json }},
+					"receipt": {{ transaction.receipt | json }},
+					"status": {{ transaction.status | json }},
+					"status_label": {{ transaction.status_label | json }}
+				}{% unless forloop.last %},{% endunless %}{% endfor %}
+			]
+		}{% unless forloop.last %},{% endunless %}
+	{% endfor %}{% endpaginate %}],
+  "orders_count": {{ customer.orders_count | json }},
+  "phone": {{ customer.phone | json }},
+  "tags": {{ customer.tags | json }},
+  "tax_exempt": {{ customer.tax_exempt | json }},
+  "total_spent": {{ customer.total_spent | json }}
 {{r}}{% endcapture %}
-{{ order_json }}
-{% when 'index' %}
-{% capture linklists %}
-{% assign navigation_handles='main-menu,footer,catalog' | split: "," %}{{l}}
-{% for handle in navigation_handles %}
-{% assign menu=linklists[handle] %}
-{{handle | json}}: {{l}}
-"levels": {{menu.levels | json}}, 
-"title": {{menu.title | json}}, 
-"links": [{% for link in menu.links %}{{l}}
-	"url": {{link.url | json}}, 
-	"active": {{link.active | json}}, 
-	"child_active": {{link.child_active | json}}, 
-	"levels": {{link.levels | json}}, 
-	"object": {{link.object | json | split: ',' | join: ','}}, 
-	"title": {{link.title | json}}, 
-	"type": {{link.type | json}}{{r}}{% unless forloop.last %},{% endunless %}{% endfor %}]
-{{r}}{% unless forloop.last %},{% endunless %}
-{% endfor %}{{r}}
-{% endcapture %}
-{% capture shop_metafield_names %}{% render 'metafield-keys', type: 'shop' %}{% endcapture %}
-{% assign shop_metafield_names = shop_metafield_names | strip | split: ","%}
-{% capture shop %}{{l}}
-"address": {{ shop.address|json }},
-"collections_count": {{ shop.collections_count | json }},
-"currency": {{ shop.currency | json }},
-"enabled_currencies": {{ shop.enabled_currencies | json }},
-"description": {{ shop.description | json }},
-"domain": {{ shop.domain | json}},
-"email": {{ shop.email | json }},
-"enabled_payment_types": {{ shop.enabled_payment_types | json }},
-"locale": {{shop.locale|json}},
-{% if shop_metafield_names.size > 0 %}"metafields":{{l}}{% for metafield_name in shop_metafield_names %}{{ metafield_name | json }}:{{ shop.metafields[metafield_name] | json }}{% unless forloop.last %},{% endunless %}{% endfor %}{{r}}{% else %}"metafields":{}{% endif %},
-"money_format": {{shop.money_format|json}},
-"money_with_currency_format": {{ shop.money_with_currency_format | json }},
-"name": {{ shop.name | json }},
-"password_message": {{ shop.password_message | json }},
-"permanent_domain": {{ shop.permanent_domain | json }},
-"phone": {{ shop.phone | json }},
-"policies": {{ shop.policies | json }},
-"products_count": {{ shop.products_count | json }},
-"secure_url": {{ shop.secure_url | json }},
-"taxes_included": {{ shop.taxes_included | json }},
-"types": {{ shop.types | json }},
-"url": {{ shop.url | json }},
-"vendors": {{ shop.vendors | json }},
-"settings": {{ settings | json }},
-"linklists": {{ linklists | strip }}
-{{r}}{% endcapture %}
-{{ shop }}
-{% else %}
+{{ customer_json }}
 {% when 'list-collections' %}
 [
 	{{l}}

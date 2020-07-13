@@ -1,6 +1,8 @@
+/* eslint-disable no-nested-ternary */
 import ajaxAPIsCreator from './ajax';
 import Store from './Store';
 import helpers from './helpers';
+import defaultTransformFnsCreator from './defaultTransformFns';
 import 'lazysizes';
 import 'lazysizes/plugins/rias/ls.rias';
 import 'lazysizes/plugins/bgset/ls.bgset';
@@ -41,57 +43,68 @@ export default class App {
       this.shopify = shopify;
       this.settings = settings;
       this.locales = locales;
-      this.transformFns = {
-        cart: transformFns && transformFns.cart ? transformFns.cart : [],
-        collection:
-          transformFns && transformFns.collection
-            ? [
-                ...transformFns.collection,
-                (collection) => ({
-                  ...collection,
-                  all_tags: this.helpers.handliezeTags(collection.all_tags),
-                  tags: this.helpers.handliezeTags(collection.tags),
-                  current_tags: this.helpers.concatTags(
-                    collection.current_tags
-                  ),
-                }),
-              ]
-            : [
-                (collection) => ({
-                  ...collection,
-                  all_tags: this.helpers.handliezeTags(collection.all_tags),
-                  tags: this.helpers.handliezeTags(collection.tags),
-                  current_tags: this.helpers.concatTags(
-                    collection.current_tags
-                  ),
-                }),
-              ],
-        product:
-          transformFns && transformFns.product ? transformFns.product : [],
-        blog:
-          transformFns && transformFns.blog
-            ? [
-                ...transformFns.blog,
-                (blog) => ({
-                  ...blog,
-                  all_tags: this.helpers.handliezeTags(blog.all_tags),
-                  tags: this.helpers.handliezeTags(blog.tags),
-                  current_tags: this.helpers.concatTags(blog.current_tags),
-                }),
-              ]
-            : [
-                (blog) => ({
-                  ...blog,
-                  all_tags: this.helpers.handliezeTags(blog.all_tags),
-                  tags: this.helpers.handliezeTags(blog.tags),
-                  current_tags: this.helpers.concatTags(blog.current_tags),
-                }),
-              ],
-      };
       this.customElementGroupTypeList = {};
       this.customElementGroups = {};
       this.helpers = helpers;
       this.components = {};
+      this.transformFns = {
+        cart:
+          transformFns && transformFns.cart
+            ? [
+                ...transformFns.cart,
+                ...defaultTransformFnsCreator(this.helpers).cart,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).cart],
+        collection:
+          transformFns && transformFns.collection
+            ? [
+                ...transformFns.collection,
+                ...defaultTransformFnsCreator(this.helpers).collection,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).collection],
+        product:
+          transformFns && transformFns.product
+            ? [
+                ...transformFns.product,
+                ...defaultTransformFnsCreator(this.helpers).product,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).product],
+        blog:
+          transformFns && transformFns.blog
+            ? [
+                ...transformFns.blog,
+                ...defaultTransformFnsCreator(this.helpers).blog,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).blog],
+        search:
+          transformFns && transformFns.search
+            ? [
+                ...transformFns.search,
+                ...defaultTransformFnsCreator(this.helpers).search,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).search],
+        article:
+          transformFns && transformFns.article
+            ? [
+                ...transformFns.article,
+                ...defaultTransformFnsCreator(this.helpers).article,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).article],
+        page:
+          transformFns && transformFns.page
+            ? [
+                ...transformFns.page,
+                ...defaultTransformFnsCreator(this.helpers).page,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).page],
+        customer:
+          transformFns && transformFns.customer
+            ? [
+                ...transformFns.customer,
+                ...defaultTransformFnsCreator(this.helpers).customer,
+              ]
+            : [...defaultTransformFnsCreator(this.helpers).customer],
+      };
 
       App.instance = this;
     }

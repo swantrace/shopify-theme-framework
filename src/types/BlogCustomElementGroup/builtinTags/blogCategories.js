@@ -8,6 +8,6 @@ export default {
     element
   ) => {
     const { html } = helpers;
-    return html`blog article list item`;
+    return html`blogCategories`;
   },
 };

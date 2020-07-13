@@ -5,6 +5,7 @@ import blogTags from './blogTags';
 import blogPagination from './blogPagination';
 import blogRecentArticles from './blogRecentArticles';
 import blogBreadcrumb from './blogBreadcrumb';
+import blogCategories from './blogCategories';
 
 export default {
   'blog-articles-list': blogArticlesList,
@@ -13,5 +14,6 @@ export default {
   'blog-tags': blogTags,
   'blog-pagination': blogPagination,
   'blog-recent-articles': blogRecentArticles,
+  'blog-categories': blogCategories,
   'blog-breadcrumb': blogBreadcrumb,
 };

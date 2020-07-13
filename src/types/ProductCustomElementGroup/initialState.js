@@ -13,6 +13,7 @@ export default Object.freeze({
   has_only_default_variant: false,
   id: null,
   images: [],
+  is_main: false,
   media: [],
   metafields: {},
   options: [],

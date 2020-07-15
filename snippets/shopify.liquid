@@ -6,6 +6,7 @@
   shopProductsCount: {{ shop.products_count }},
   shopCustomerAccountsEnabled: {{ shop.customer_accounts_enabled | json }},
   moneyFormat: {{ shop.money_format | json }},
+  customerLoggedIn: {% if customer %}true{%else%}false,
   moneyWithCurrencyFormat: {{ shop.money_with_currency_format | json }},
   requestHost: {{ request.host | json }},
   requestLocale: {

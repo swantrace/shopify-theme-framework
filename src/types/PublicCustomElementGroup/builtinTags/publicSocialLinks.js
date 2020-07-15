@@ -7,139 +7,64 @@ export default {
   'default-main': ({ helpers, hook, settings, locales, shopify }) => (
     element
   ) => {
-    const { html } = helpers;
+    const { html, escapeStr, unsafeHTML, capitalize } = helpers;
+    const rssLink = `${
+      settings.global.social_rss_link
+        ? `<li>
+            <a
+              class="icon-fallback-text"
+              href="${escapeStr(settings.global.social_rss_link)}"
+              title="${locales[
+                locales.currentLanguage
+              ].layout.footer.social_platform
+                .replace('{{ name }}', shopify.shopName)
+                .replace('{{ platform }}', 'RSS')}"
+              target="_blank"
+              aria-describedby="a11y-new-window-external-message"
+            >
+              <span class="icon icon-twitter" aria-hidden="true"></span>
+              <span class="fallback-text">RSS</span>
+            </a>
+          </li>`
+        : ``
+    }`;
+
     return html`<ul class="inline-list social-icons">
-      {%- if settings.social_twitter_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_twitter_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Twitter' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-twitter" aria-hidden="true"></span>
-          <span class="fallback-text">Twitter</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_facebook_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_facebook_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Facebook' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-facebook" aria-hidden="true"></span>
-          <span class="fallback-text">Facebook</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_pinterest_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_pinterest_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Pinterest' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-pinterest" aria-hidden="true"></span>
-          <span class="fallback-text">Pinterest</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_instagram_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_instagram_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Instagram' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-instagram" aria-hidden="true"></span>
-          <span class="fallback-text">Instagram</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_snapchat_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_snapchat_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Snapchat' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-snapchat" aria-hidden="true"></span>
-          <span class="fallback-text">Snapchat</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_tumblr_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_tumblr_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Tumblr' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-tumblr" aria-hidden="true"></span>
-          <span class="fallback-text">Tumblr</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_youtube_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_youtube_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'YouTube' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-youtube" aria-hidden="true"></span>
-          <span class="fallback-text">YouTube</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_vimeo_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_vimeo_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Vimeo' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-vimeo" aria-hidden="true"></span>
-          <span class="fallback-text">Vimeo</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_fancy_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_fancy_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'Fancy' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-fancy" aria-hidden="true"></span>
-          <span class="fallback-text">Fancy</span>
-        </a>
-      </li>
-      {%- endif -%} {%- if settings.social_rss_link != blank -%}
-      <li>
-        <a
-          class="icon-fallback-text"
-          href="{{ settings.social_rss_link | escape }}"
-          title="{{ 'layout.footer.social_platform' | t: name: shop.name, platform: 'RSS' }}"
-          target="_blank"
-          aria-describedby="a11y-new-window-external-message"
-        >
-          <span class="icon icon-rss" aria-hidden="true"></span>
-          <span class="fallback-text">RSS</span>
-        </a>
-      </li>
-      {%- endif -%}
+      ${[
+        'twitter',
+        'facebook',
+        'pinterest',
+        'instagram',
+        'snapchat',
+        'tumblr',
+        'youtube',
+        'vimeo',
+        'fancy',
+      ].map(
+        (name) => html`
+          ${settings.global[`social_${name}_link`]
+            ? html`
+                <li>
+                  <a
+                    class="icon-fallback-text"
+                    href="${escapeStr(settings.global[`social_${name}_link`])}"
+                    title="${locales[
+                      locales.currentLanguage
+                    ].layout.footer.social_platform
+                      .replace('{{ name }}', shopify.shopName)
+                      .replace('{{ platform }}', capitalize(name))}"
+                    target="_blank"
+                    aria-describedby="a11y-new-window-external-message"
+                  >
+                    <span class="icon icon-${name}" aria-hidden="true"></span>
+                    <span class="fallback-text">${capitalize(name)}</span>
+                  </a>
+                </li>
+              `
+            : html``}
+        `
+      )}
+      ${unsafeHTML(rssLink)}
     </ul> `;
   },
 };

@@ -142,6 +142,29 @@
 
 </footer>
 
+ {%- if request.page_type == 'index' -%}
+    <p id="slideshow-info" 
+       class="visually-hidden" 
+       aria-hidden="true" 
+       data-t="home_page.slideshow.navigation_instructions"
+    >
+      {{- 'home_page.slideshow.navigation_instructions' | t -}}
+    </p>
+    {%- endif -%}
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">
+        {{ 'general.accessibility.refresh_page' | t }}
+      </li>
+      <li id="a11y-external-message">
+        {{ 'general.accessibility.new_window' | t }}
+      </li>
+      <li id="a11y-new-window-external-message">
+        {{ 'general.accessibility.new_window_and_external' | t }}
+      </li>
+    </ul>
+
+
 <script>
   window.theme = window.theme || {};
   theme.settings = theme.settings || {};

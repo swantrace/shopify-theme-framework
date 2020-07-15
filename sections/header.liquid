@@ -2,8 +2,12 @@
 <script>
   window.theme = window.theme || {};
   theme.settings = theme.settings || {};
-  theme.settings['header'] = {{ section.settings | json }};
-  theme.settings['header'].id = {{ section.id | json }};
+  theme.settings.header = {
+    ...{{ section.settings | json }}, 
+    id: {{ section.id | json }}, 
+    logo: {{ section.settings.logo | img_url: '1x1' | json }},
+    logoWidth: Math.min(parseInt({{ section.settings.logo_max_width}}, 10), 695)
+  };
 </script>
 
 {% schema %}

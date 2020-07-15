@@ -16,7 +16,7 @@ const publicHeader = {
 const publicCartIcon = {
   observedAttributes: [],
   hook: (id, helpers) => (store) => (element) => {
-    return [];
+    return [{ item_count: 5 }];
   },
 };
 

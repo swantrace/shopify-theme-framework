@@ -8,14 +8,10 @@ export default {
     element
   ) => {
     const { html, unsafeHTML } = helpers;
-    let logoWidth = 695;
-    logoWidth = Math.min(
-      parseInt(settings.header.logo_max_width, 10),
-      logoWidth
-    );
+
     const headerStyle = `<style>
       .log__image-wrapper {
-        max-width: ${logoWidth}px;
+        max-width: ${settings.header.logoWidth}px;
       }
       ${
         settings.header.show_header_lines

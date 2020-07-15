@@ -1,21 +1,219 @@
 [
-  { 
-    type: 'collection', 
-    id: 'main', 
-    tagDefinitions: { 
-      'collection-tags': 'default-main', 
+  {
+    type: 'public',
+    id: 'main',
+    tagDefinitions: {
+      'public-announcement-bar': 'default-main',
+      'public-header': 'default-main',
+      'public-cart-icon': 'default-main',
+      'public-mobile-cart-icon': 'default-main',
+      'public-mini-cart-top': 'default-main',
+      'public-mini-cart-right': 'default-main',
+      'public-mini-cart-modal': 'default-main',
+      'public-language-selector': 'default-main',
+      'public-currency-selector': 'default-main',
+      'public-search-bar': 'default-main',
+      'public-navigation': 'default-main',
+      'public-mobile-navigation': 'default-main',
+      'public-logo': 'default-main',
+      'public-footer': 'default-main',
+      'public-copyright': 'default-main',
+      'public-payment-icons': 'default-main',
+      'public-quickview-modal': 'default-main',
+      'public-social-links': 'default-main',
+      'public-customer-account': 'default-main'
+    },
+  },
+  {% case template.name %}
+  {% when 'search' %}
+  {
+    type: 'search',
+    id: 'main',
+    tagDefinitions: {
+      'search-intro': 'default-main',
+      'search-bar': 'default-main',
+      'search-items-list': 'default-main',
+      'search-list-item': 'default-main',
+      'search-grid-item': 'default-main',
+      'search-pagination': 'default-main',
+    },
+  },
+  {% when 'blog' %}
+  {
+    type: 'blog',
+    id: 'main',
+    tagDefinitions: {
+      'blog-articles-list': 'default-main',
+      'blog-article-grid-item': 'default-main',
+      'blog-article-list-item': 'default-main',
+      'blog-tags': 'default-main',
+      'blog-pagination': 'default-main',
+      'blog-recent-articles': 'default-main',
+      'blog-categories': 'default-main',
+      'blog-breadcrumb': 'default-main',
+    },
+  },
+  {% when 'product' %}
+  {
+    type: 'product',
+    id: 'main',
+    tagDefinitions: {
+      'product-addtocart-form': 'default-main',
+      'product-meta': 'default-main',
+      'product-description': 'default-main',
+      'product-images': 'default-main',
+      'product-recommendations': 'default-main',
+      'product-breadcrumb': 'default-main',
+    },
+  },
+  {% when 'password' %}
+  {
+    type: 'password',
+    id: 'main',
+    tagDefinitions: {
+      'password-login-modal': 'default-main',
+      'password-footer': 'default-main',
+      'passowrd-header': 'default-main',
+      'password-content': 'default-main',
+    },
+  },
+  {% when 'page' %}
+  {
+    type: 'page',
+    id: 'main',
+    tagDefinitions: {
+      'page-title': 'default-main',
+      'page-content': 'default-main',
+      'page-contact-form': 'default-main',
+    },
+  },
+  {% when 'list-collection' %}
+  {
+    type: 'list-collection',
+    id: 'main',
+    tagDefinitions: {
+      'collections-list': 'default-main',
+      'collections-list-item': 'default-main',
+      'collections-list-breadcrumb': 'default-main',
+      'collections-list-pagination': 'default-main',
+    },
+  },
+  {% when 'index' %}
+  {
+    type: 'index',
+    id: 'main',
+    tagDefinitions: {
+      'index-slideshow': 'default-main',
+      'index-image-with-text': 'default-main',
+      'index-gallery': 'default-main',
+      'index-featured-product': 'default-main',
+      'index-featured-collection': 'default-main',
+      'index-newsletter': 'default-main',
+      'index-map': 'default-main',
+      'index-rich-text': 'default-main',
+      'index-video': 'default-main',
+      'index-custom-html': 'default-main',
+      'index-blog-posts': 'default-main',
+    },
+  },
+  {% when 'login' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-login': 'default-main',
+    },
+  },
+  {% when 'register' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-register': 'default-main',
+    },
+  },
+  {% when 'reset_password' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-reset-password': 'default-main',
+    },
+  },
+  {% when 'order' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-order': 'default-main',
+    },
+  },
+  {% when 'addresses'%}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-addresses': 'default-main',
+    },
+  },
+  {% when 'account' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-account': 'default-main',
+    },
+  },
+  {% when 'activate_account' %}
+  {
+    type: 'customer',
+    id: 'main',
+    tagDefinitions: {
+      'customer-active-account': 'default-main',
+    },
+  },
+  {% when 'cart' %}
+  {
+    type: 'cart',
+    id: 'main',
+    tagDefinitions: {
+      'cart-form': 'default-main',
+    },
+  },
+  {% when 'article' %}
+  {
+    type: 'article',
+    id: 'main',
+    tagDefinitions: {
+      'article-breadcrumb': 'default-main',
+      'article-meta': 'default-main',
+      'article-title': 'default-main',
+      'article-content': 'default-main',
+      'article-social-sharing': 'default-main',
+      'article-blog-recent-articles': 'default-main',
+      'article-blog-categories': 'default-main',
+    },
+  },
+  {% when '404' %}
+  {
+    type: 'fourZeroFour',
+    id: 'main',
+    tagDefinitions: {
+      'fourzerofour-page-content': 'default-main',
+    },
+  },
+  {% when 'collection' %}
+  {
+    type: 'collection',
+    id: 'main',
+    tagDefinitions: {
+      'collection-tags': 'default-main',
       'collection-pagination': 'default-main',
       'collection-sorting': 'default-main',
       'collection-products-list': 'default-main',
       'collection-product-grid-item': 'default-main',
       'collection-product-list-item': 'default-main',
-    }, 
-  }, 
-  { 
-    type: 'fourZeroFour', 
-    id: 'main',
-    tagDefinitions: { 
-      'fourzerofour-page-content': 'default-main', 
-    }, 
-  }, 
+    },
+  },
+  {% endcase %}
 ]
